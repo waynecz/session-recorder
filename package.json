@@ -1,0 +1,21 @@
+{
+  "name": "friday",
+  "version": "0.0.1",
+  "description": "Get visualized feedback & analytics proactively",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.elenet.me:god-dev/friday.git"
+  },
+  "keywords": [
+    "feedback",
+    "heatmap",
+    "analysis",
+    "uirecord"
+  ],
+  "author": "chengzhou.weng",
+  "license": "MIT"
+}
