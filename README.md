@@ -3,16 +3,16 @@
 ## Features expected:
 
 #### Basic
-+ [ ]UI record & session replay & feedback
-+ [ ]Screenshot
++ [ ] UI record & session replay & feedback
++ [ ] Screenshot
 
 
 #### Advanced
-+ [ ]Heatmap
-+ [ ]Painless track
-+ [ ]Survey
-+ [ ]User guide
-+ [ ]Daily/Weekly Report
++ [ ] Heatmap
++ [ ] Painless track
++ [ ] Survey
++ [ ] User guide
++ [ ] Daily/Weekly Report
 
 ## Homogeneous products
 + [inspectlet](https://www.inspectlet.com/)
