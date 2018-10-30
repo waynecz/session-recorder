@@ -1,5 +1,11 @@
-enum anme {
-  his = '1213123113'
-}
+import 'recorder'
+import 'ui'
+import 'friday'
 
-console.log(anme.his)
+import 'styles/index.scss'
+
+export default class Friday {
+  constructor(options) {
+    
+  }
+}

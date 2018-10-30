@@ -1,0 +1,1 @@
+export const ID_KEY = 'friday-id'

@@ -3,22 +3,25 @@
 ## Features expected:
 
 #### Basic
-+ [ ] UI record & session replay & feedback
++ [ ] UI record 
++ [ ] Feedback
 + [ ] Screenshot
 
 
 #### Advanced
++ [ ] Error capture
 + [ ] Heatmap
-+ [ ] Painless track
-+ [ ] Survey
++ [ ] Integrate the Formhub to provide Survey
++ [ ] Poll
 + [ ] User guide
 + [ ] Daily/Weekly Report
++ [ ] Funnels
 
 ## Homogeneous products
-+ [inspectlet](https://www.inspectlet.com/)
++ [sessionstack](https://www.sessionstack.com/)
 + [hotjar](https://www.hotjar.com/)
 + [pendo](https://www.pendo.io/)
++ [inspectlet](https://www.inspectlet.com/)
 + [smartlook](https://www.smartlook.com/)
-+ [sessionstack](https://www.sessionstack.com/)
 + [mouseflow](https://www.mouseflow.com/)
 + [fullstory](https://www.fullstory.com/)

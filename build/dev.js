@@ -3,6 +3,7 @@ const merge = require('webpack-merge')
 const path = require('path')
 const baseWebpackConfig = require('./base')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 function resolve(dir) {
   return path.join(__dirname, '..', dir)
@@ -12,6 +13,11 @@ const devConfig = merge(baseWebpackConfig, {
   mode: 'development',
   
   plugins: [
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      template: 'index.html',
+      inject: true
+    }),
 
     new CopyWebpackPlugin([
       {
