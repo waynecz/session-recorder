@@ -10,13 +10,13 @@ export function _throttle<T, K>(
 ): (T: T) => K {
   let previous: number = Date.now()
 
-  return function(): K {
+  return function(...args: any[]): K {
     const now = Date.now()
     const restTime = now - previous
 
     if (restTime >= wait) {
       previous = now
-      return func.call(this, ...arguments)
+      return func.apply(this, args)
     }
   }
 }

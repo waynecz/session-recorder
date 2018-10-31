@@ -1,21 +1,23 @@
-import { ObserverClass, EventReocrd, EventTypes } from 'models/observer'
-import { EventObserveOptions, Listener } from 'models/event'
+import { ObserverClass } from 'models/observers'
+import { EventReocrd, EventTypes } from 'models/observers/event'
+import { EventObserveOptions, Listener } from 'models/observers/event'
+import { ElementX, FormELement } from 'models/friday'
 import { _throttle } from 'tools/helpers'
 import FridayDocument from 'tools/document'
-import { ElementX, FormELement } from 'models/friday'
 
 const { getFridayIdByNode } = FridayDocument
 
 /**
  * Observe scroll, click, mousemove, window resize, form change(input/textarea/radio etc.)
- * and produce an Record 
+ * and produce an Record
  **/
 export default class EventObserver implements ObserverClass {
   public name: string = 'EventObserver'
   private listeners: Listener[] = []
 
-  constructor(public whenEventBeenFired, options: EventObserveOptions) {
-    this.install(options)
+  constructor(public onobserved, options: EventObserveOptions | boolean) {
+    if (options === false) return
+    this.install(options as EventObserveOptions)
   }
 
   /**
@@ -31,8 +33,11 @@ export default class EventObserver implements ObserverClass {
     })
   }
 
+  /** Provide that Document's direction is `rtl`(default) */
   private getScrollPosition(): { x: number; y: number } {
+    // Quirks mode on the contrary
     const isStandardsMode = document.compatMode === 'CSS1Compat'
+
     const x = isStandardsMode
       ? document.documentElement.scrollLeft
       : document.body.scrollLeft
@@ -45,7 +50,7 @@ export default class EventObserver implements ObserverClass {
 
   private getScrollRecord(evt?: Event): void {
     const { target } = evt
-    const { whenEventBeenFired } = this
+    const { onobserved } = this
 
     let record = { type: EventTypes.scroll } as EventReocrd
 
@@ -53,7 +58,7 @@ export default class EventObserver implements ObserverClass {
     if (target === document || !target) {
       let { x, y } = this.getScrollPosition()
       record = { ...record, x, y }
-      whenEventBeenFired(record)
+      onobserved(record)
       return
     }
 
@@ -63,28 +68,28 @@ export default class EventObserver implements ObserverClass {
 
     record = { ...record, x, y, target: fridayId }
 
-    whenEventBeenFired(record)
+    onobserved(record)
   }
 
   private getMouseClickRecord(evt: MouseEvent): void {
     const { pageX: x, pageY: y } = evt
     const record: EventReocrd = { type: EventTypes.click, x, y }
 
-    this.whenEventBeenFired(record)
+    this.onobserved(record)
   }
 
   private getMouseMoveRecord(evt: MouseEvent): void {
     const { pageX: x, pageY: y } = evt
     const record: EventReocrd = { type: EventTypes.move, x, y }
 
-    this.whenEventBeenFired(record)
+    this.onobserved(record)
   }
 
   private getResizeRecord(): void {
     const { clientWidth: w, clientHeight: h } = document.documentElement
     const record: EventReocrd = { type: EventTypes.resize, w, h }
 
-    this.whenEventBeenFired(record)
+    this.onobserved(record)
   }
 
   private getFormChangeRecord(evt: Event): void {
@@ -114,7 +119,7 @@ export default class EventObserver implements ObserverClass {
       v
     }
 
-    this.whenEventBeenFired(record)
+    this.onobserved(record)
   }
 
   install({

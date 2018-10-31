@@ -1,18 +1,18 @@
+import { ObserverClass } from 'models/observers'
 import {
-  ObserverClass,
-  DOMRecord,
+  DOMMutationRecord,
   DOMMutationTypes,
-  MutationRecordX,
   NodeMutationData
-} from 'models/observer'
+} from 'models/observers/mutation'
+import { window, MutationRecordX } from 'models/friday'
+
 import { ID_KEY } from 'constants'
 import FridayDocument from 'tools/document'
 import { _log } from 'tools/helpers'
-import { window } from 'models/friday';
 
 const { getFridayIdByNode } = FridayDocument
 
-/** 
+/**
  * Observe DOM change such as DOM-add/remove text-change attribute-change
  * and generate an Record
  **/
@@ -20,7 +20,7 @@ export default class DOMMutationObserver implements ObserverClass {
   public name: string = 'DOMMutationObserver'
   private observer: MutationObserver
 
-  constructor(public whenMutationBeenObserved) {
+  constructor(public onobserved) {
     this.install()
   }
 
@@ -53,8 +53,11 @@ export default class DOMMutationObserver implements ObserverClass {
   }
 
   // when node's attribute change
-  private getAttrReocrd({ attributeName, target }: MutationRecordX): DOMRecord {
-    let record = { attr: {} } as DOMRecord
+  private getAttrReocrd({
+    attributeName,
+    target
+  }: MutationRecordX): DOMMutationRecord {
+    let record = { attr: {} } as DOMMutationRecord
     record.target = getFridayIdByNode(target)
 
     record.type = DOMMutationTypes.attr
@@ -65,8 +68,8 @@ export default class DOMMutationObserver implements ObserverClass {
   }
 
   // when textNode's innerText change
-  private getTextRecord({ target }: MutationRecordX): DOMRecord {
-    let record = {} as DOMRecord
+  private getTextRecord({ target }: MutationRecordX): DOMMutationRecord {
+    let record = {} as DOMMutationRecord
     record.target = getFridayIdByNode(target)
 
     record.type = DOMMutationTypes.text
@@ -90,8 +93,8 @@ export default class DOMMutationObserver implements ObserverClass {
     removedNodes,
     previousSibling,
     nextSibling
-  }: MutationRecordX): DOMRecord {
-    let record = {} as DOMRecord
+  }: MutationRecordX): DOMMutationRecord {
+    let record = {} as DOMMutationRecord
     record.target = getFridayIdByNode(target)
 
     if (previousSibling) {
@@ -195,13 +198,13 @@ export default class DOMMutationObserver implements ObserverClass {
       window.MutationObserver || window.WebKitMutationObserver
 
     this.observer = new MutationObserver((records: MutationRecord[]) => {
-      const { whenMutationBeenObserved } = this
+      const { onobserved } = this
 
       for (let record of records) {
-        const DOMRecord = this.process(record as MutationRecordX)
+        const DOMMutationRecord = this.process(record as MutationRecordX)
 
-        if (DOMRecord && whenMutationBeenObserved) {
-          whenMutationBeenObserved(DOMRecord)
+        if (DOMMutationRecord && onobserved) {
+          onobserved(DOMMutationRecord)
         }
       }
     })
