@@ -1,5 +1,6 @@
 import { ID_KEY } from 'constants'
-import { ElementX } from 'models'
+import { ElementX } from 'models/friday'
+import { _newuuid } from './helpers';
 
 /**
  * 1.Store initial document string
@@ -7,7 +8,7 @@ import { ElementX } from 'models'
  * 3.Add / Remove fridayId
  **/
 class FridayDocumentMachine {
-  public map: Map<HTMLElement | Element | Node, string> = new Map()
+  public map: Map<HTMLElement | Element | Node | EventTarget, string> = new Map()
   public initialDocument: string
 
   constructor() {
@@ -40,8 +41,8 @@ class FridayDocumentMachine {
     node.removeAttribute(ID_KEY)
   }
 
-  addOneNode2Map(node: HTMLElement | Element): string {
-    let fridayId = this.map.get(node) || this.newFridayId()
+  addOneNode2Map(node: ElementX): string {
+    let fridayId = this.map.get(node) || _newuuid()
     this.map.set(node, fridayId)
     this.markNode(node, fridayId)
     return fridayId
@@ -71,15 +72,8 @@ class FridayDocumentMachine {
   }
 
   // get fridayId from map by node
-  getFridayIdByNode(node: HTMLElement | Element): string {
+  getFridayIdByNode(node: ElementX | EventTarget): string {
     return this.map.get(node)
-  }
-
-  // weak uuid
-  newFridayId(): string {
-    return Math.random()
-      .toString(16)
-      .split('.')[1]
   }
 }
 

@@ -1,18 +1,21 @@
 import {
   ObserverClass,
-  window,
   DOMRecord,
-  DOMRecordTypes,
+  DOMMutationTypes,
   MutationRecordX,
-  NodeX
-} from 'models'
+  NodeMutationData
+} from 'models/observer'
 import { ID_KEY } from 'constants'
 import FridayDocument from 'tools/document'
 import { _log } from 'tools/helpers'
+import { window } from 'models/friday';
 
 const { getFridayIdByNode } = FridayDocument
 
-/** Observe DOM change such as DOM-add/remove text-change attribute-change */
+/** 
+ * Observe DOM change such as DOM-add/remove text-change attribute-change
+ * and generate an Record
+ **/
 export default class DOMMutationObserver implements ObserverClass {
   public name: string = 'DOMMutationObserver'
   private observer: MutationObserver
@@ -29,7 +32,7 @@ export default class DOMMutationObserver implements ObserverClass {
 
     switch (mutationRecord.type) {
       case 'attributes': {
-        // friday id change ignore
+        // ignore fridayId mutate
         if (attributeName !== ID_KEY) return
 
         return this.getAttrReocrd(mutationRecord)
@@ -54,7 +57,7 @@ export default class DOMMutationObserver implements ObserverClass {
     let record = { attr: {} } as DOMRecord
     record.target = getFridayIdByNode(target)
 
-    record.type = DOMRecordTypes.attr
+    record.type = DOMMutationTypes.attr
     record.attr.k = attributeName
     record.attr.v = target.getAttribute(attributeName)
 
@@ -66,17 +69,17 @@ export default class DOMMutationObserver implements ObserverClass {
     let record = {} as DOMRecord
     record.target = getFridayIdByNode(target)
 
-    record.type = DOMRecordTypes.text
+    record.type = DOMMutationTypes.text
     // use testConent instend of innerText(non-standard),
-    // see alse https://stackoverflow.com/questions/35213147/difference-between-textcontent-vs-innertext
+    // see also https://stackoverflow.com/questions/35213147/difference-between-textcontent-vs-innertext
     record.text = target.textContent
 
     return record
   }
 
   /**
-   * @Tip:
-   * invoke when node/textNode added or removed,
+   * @Either:
+   * invoke when node added or removed,
    * @Or:
    * if a contenteditable textNode's text been all removed, type should be `childList`(remove #text),
    * later if you type/add some text in this empty textNode, the first mutation's type would be `childList`(add #text), fellows by `characterData`s
@@ -103,44 +106,73 @@ export default class DOMMutationObserver implements ObserverClass {
     const { length: isAdd } = addedNodes
     const { length: isRemove } = removedNodes
 
-    if (isAdd || isRemove) {
-      // addnodes / removenodes could exist both
-      record.type = DOMRecordTypes.node
+    if (!isAdd || !isRemove) return
 
-      this.nodesFilter(addedNodes).forEach(node => {
-        let nodeData = {} as NodeX
+    // addnodes / removenodes could exist both
+    record.type = DOMMutationTypes.node
+
+    /** Add */
+    this.nodesFilter(addedNodes).forEach(
+      (node): void => {
+        let nodeData = {} as NodeMutationData
         record.add = []
+
+        function getNodeHTML() {
+          _log(this)
+          nodeData.html = node.outerHTML
+        }
 
         switch (node.nodeName) {
           case '#text': {
-            // nodeValue see https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue
+            // nodeValue: https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue
             nodeData.html = target.nodeValue
             record.add.push(nodeData)
-            return
+            break
           }
 
           default: {
-            const { parentElement } = node
+            const { parentElement, nodeValue } = node
 
-            // in case the node isn't the <html> element
-            if (parentElement) {
-              nodeData.index = this.getNodeIndex(parentElement, node)
-              FridayDocument.storeNewNode({
-                node,
-                beforeUnmark: () => {
-                  _log(this)
-                  nodeData.html = node.outerHTML
-                }
-              })
+            if (!parentElement) {
+              // in case the node was the <html> element
+              // TODO: find out when should the nodeData.index === -1
+              nodeData.html = nodeValue
+              break
             }
-            // TODO: find out what purpose of the code below
-            if (nodeData.index === -1) {
-              nodeData.html = node.nodeValue
-            }
+
+            nodeData.index = this.getNodeIndex(parentElement, node)
+
+            FridayDocument.storeNewNode({
+              node,
+              beforeUnmark: getNodeHTML
+            })
           }
         }
-      })
-    }
+
+        record.add.push(nodeData)
+      }
+    )
+
+    /** Remove */
+    this.nodesFilter(removedNodes).forEach(
+      (node): void => {
+        let nodeData = {} as NodeMutationData
+        record.remove = []
+
+        switch (node.nodeName) {
+          case '#text': {
+            nodeData.html = target.nodeValue
+            break
+          }
+
+          default: {
+            nodeData.target = getFridayIdByNode(node)
+          }
+        }
+
+        record.remove.push(nodeData)
+      }
+    )
 
     return record
   }
