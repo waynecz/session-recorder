@@ -27,3 +27,35 @@ export function _newuuid(): string {
     .toString(16)
     .split('.')[1]
 }
+
+/**
+ * Wrap a given method with a high-order function
+ *
+ * @param source The object that contains a method to be wrapped.
+ * @param name The name of method to be wrapped
+ * @param replacement The function that should be used to wrap the given method
+ */
+export function _replace(
+  source: object,
+  name: string,
+  replacement: (...args: any[]) => any
+): void {
+  if (!(name in source) || source[name].__firday__) return
+  
+  const original = source[name]
+  const wrapped = replacement(original)
+
+  wrapped.__firday__ = true
+  wrapped.__firday_original__ = original
+}
+
+/**
+ * Reverse to original method
+ */
+export function _original(source: object, name: string): void {
+  if (!(name in source) || !source[name].__firday__) return
+
+  const { __firday_original__ } = source[name]
+
+  source[name] = __firday_original__
+}

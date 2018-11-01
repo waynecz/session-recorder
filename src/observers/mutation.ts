@@ -19,6 +19,7 @@ const { getFridayIdByNode } = FridayDocument
 export default class DOMMutationObserver implements ObserverClass {
   public name: string = 'DOMMutationObserver'
   private observer: MutationObserver
+  public active: boolean
 
   constructor(public onobserved) {
     this.install()
@@ -215,6 +216,8 @@ export default class DOMMutationObserver implements ObserverClass {
       characterData: true,
       subtree: true
     })
+
+    this.active = true
   }
 
   uninstall() {
@@ -222,5 +225,7 @@ export default class DOMMutationObserver implements ObserverClass {
       this.observer.disconnect()
       this.observer = null
     }
+
+    this.active = false
   }
 }

@@ -10,7 +10,7 @@ export enum ConsoleLevels {
 
 export enum ErrorTypes {
   jserr = 'jserr',
-  reject = 'reject'
+  unhandlerejection = 'unhandlerejection'
 }
 
 export type ErrorObserveOptions = {
@@ -21,9 +21,8 @@ export type ErrorObserveOptions = {
 export interface ErrorRecord extends Record {
   type: ErrorTypes
   file?: string
-  line?: string // `lineo:colno`
+  line?: string // `lineo:colno`, only did type is jserr
   msg: string
   err?: any
-  // exist in promise rejection
-  reason?: any
+  stack?: string
 }

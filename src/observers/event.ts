@@ -14,10 +14,20 @@ const { getFridayIdByNode } = FridayDocument
 export default class EventObserver implements ObserverClass {
   public name: string = 'EventObserver'
   private listeners: Listener[] = []
+  public active: boolean
 
-  constructor(public onobserved, options: EventObserveOptions | boolean) {
+  constructor(
+    public onobserved,
+    public readonly options: EventObserveOptions | boolean = {
+      scroll: true,
+      click: true,
+      move: true,
+      resize: true,
+      form: true
+    }
+  ) {
     if (options === false) return
-    this.install(options as EventObserveOptions)
+    this.install()
   }
 
   /**
@@ -122,14 +132,12 @@ export default class EventObserver implements ObserverClass {
     this.onobserved(record)
   }
 
-  install({
-    scroll = true,
-    click = true,
-    move = true,
-    resize = true,
-    form = true
-  }: EventObserveOptions): void {
-    const { addListener } = this
+  install(): void {
+    const {
+      addListener,
+    } = this
+
+    const { scroll, click, move, resize, form } = this.options as EventObserveOptions
 
     if (scroll) {
       addListener({
@@ -176,11 +184,14 @@ export default class EventObserver implements ObserverClass {
         options: true
       })
     }
+
+    this.active = true
   }
 
   uninstall() {
     this.listeners.forEach(({ target, event, callback }) => {
       target.removeEventListener(event, callback)
     })
+    this.active = false
   }
 }

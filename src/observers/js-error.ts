@@ -7,9 +7,12 @@ import {
 
 export default class JSErrorObserver implements ObserverClass {
   public name: string = 'JSErrorObserver'
-  public options
+  public active: boolean
 
-  constructor(public onobserved, options?: ErrorObserveOptions | boolean) {
+  constructor(
+    public onobserved,
+    public readonly options?: ErrorObserveOptions | boolean
+  ) {
     if (options === false) return
 
     this.options = options
@@ -30,9 +33,15 @@ export default class JSErrorObserver implements ObserverClass {
   }
 
   private getUnhandlerejectionRecord(errevt: PromiseRejectionEvent) {
-    const { reason: msg } = errevt
+    let _errevt = { ...errevt }
+
+    if (!_errevt) {
+      _errevt.reason = 'undefined'
+    }
+
+    const { reason: msg } = _errevt
     const record: ErrorRecord = {
-      type: ErrorTypes.reject,
+      type: ErrorTypes.unhandlerejection,
       msg
     }
 
@@ -44,7 +53,7 @@ export default class JSErrorObserver implements ObserverClass {
     unhandlerejection = true
   }: ErrorObserveOptions): void {
     if (jserror) {
-      window.addEventListener('error', this.getGlobalerrorReocrd)
+      window.addEventListener('error', this.getGlobalerrorReocrd, true)
     }
 
     if (unhandlerejection) {
@@ -53,6 +62,8 @@ export default class JSErrorObserver implements ObserverClass {
         this.getUnhandlerejectionRecord
       )
     }
+
+    this.active = true
   }
 
   uninstall(): void {
@@ -61,5 +72,7 @@ export default class JSErrorObserver implements ObserverClass {
       'unhandledrejection',
       this.getUnhandlerejectionRecord
     )
+
+    this.active = false
   }
 }
