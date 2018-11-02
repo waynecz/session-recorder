@@ -13,11 +13,11 @@ export enum ConsoleTypes {
 }
 
 export type ConsoleObserveOptions = {
-  info: boolean
-  warn: boolean
-  error: boolean
-  debug: boolean
-  log: boolean
+  info?: boolean
+  warn?: boolean
+  error?: boolean
+  debug?: boolean
+  log?: boolean
 }
 
 export interface ConsoleRecord extends Record {

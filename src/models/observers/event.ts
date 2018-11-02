@@ -10,11 +10,11 @@ export enum EventTypes {
 }
 
 export type EventObserveOptions = {
-  scroll: boolean
-  click: boolean 
-  move: boolean
-  resize: boolean
-  form: boolean
+  scroll?: boolean
+  click?: boolean 
+  move?: boolean
+  resize?: boolean
+  form?: boolean
 }
 
 export type Listener = {

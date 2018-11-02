@@ -2,7 +2,7 @@ export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 
 export type Optional<T> = { [key in keyof T]?: T[key] }
 
-export const _log = console.log.bind(null, '[Friday]: ')
+export const _log = console.log.bind(null, '[Friday]:')
 
 export function _throttle<T, K>(
   func: (T: T) => K,
@@ -40,15 +40,26 @@ export function _replace(
   name: string,
   replacement: (...args: any[]) => any
 ): void {
-  if (!(name in source) || source[name].__firday__) return
-  
   const original = source[name]
-  const wrapped = replacement(original)
 
-  wrapped.__firday__ = true
-  wrapped.__firday_original__ = original
+  function doReplace() {
+    const wrapped = replacement(original)
 
-  source[name] = wrapped
+    wrapped.__firday__ = true
+    wrapped.__firday_original__ = original
+
+    source[name] = wrapped
+  }
+
+  if (original) {
+    // if original func existed
+    if (!(name in source) || original.__firday__) return
+    doReplace()
+  } else if (original === null || original === undefined) {
+    // such as window.onerror, it's initial function would be null
+    // in this case, do replace directly
+    doReplace()
+  }
 }
 
 /**

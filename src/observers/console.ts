@@ -5,7 +5,7 @@ import {
   ConsoleRecord,
   ConsoleLevels
 } from 'models/observers/console'
-import { _replace, _original } from 'tools/helpers'
+import { _replace, _original, _log } from 'tools/helpers'
 
 export default class ConsoleObserver implements ObserverClass {
   public name: string = 'ConsoleObserver'
@@ -19,7 +19,7 @@ export default class ConsoleObserver implements ObserverClass {
     debug: false
   }
 
-  constructor(public onobserved, options: ConsoleObserveOptions | boolean) {
+  constructor(public onobserved, options?: ConsoleObserveOptions | boolean) {
     if (options === false) return
 
     Object.assign(this.options, options)
@@ -55,6 +55,7 @@ export default class ConsoleObserver implements ObserverClass {
         _replace(console, level, consoleReplacement)
       }
     )
+    _log('console installed!')
     this.active = true
   }
 

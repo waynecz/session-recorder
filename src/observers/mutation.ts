@@ -4,13 +4,15 @@ import {
   DOMMutationTypes,
   NodeMutationData
 } from 'models/observers/mutation'
-import { window, MutationRecordX } from 'models/friday'
+import { MutationRecordX } from 'models/friday'
 
 import { ID_KEY } from 'constants'
 import FridayDocument from 'tools/document'
 import { _log } from 'tools/helpers'
 
 const { getFridayIdByNode } = FridayDocument
+
+window.DC = FridayDocument
 
 /**
  * Observe DOM change such as DOM-add/remove text-change attribute-change
@@ -110,7 +112,7 @@ export default class DOMMutationObserver implements ObserverClass {
     const { length: isAdd } = addedNodes
     const { length: isRemove } = removedNodes
 
-    if (!isAdd || !isRemove) return
+    if (!isAdd && !isRemove) return
 
     // addnodes / removenodes could exist both
     record.type = DOMMutationTypes.node
@@ -122,14 +124,13 @@ export default class DOMMutationObserver implements ObserverClass {
         record.add = []
 
         function getNodeHTML() {
-          _log(this)
           nodeData.html = node.outerHTML
         }
 
         switch (node.nodeName) {
           case '#text': {
             // nodeValue: https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue
-            nodeData.html = target.nodeValue
+            nodeData.html = node.nodeValue
             record.add.push(nodeData)
             break
           }
@@ -153,6 +154,8 @@ export default class DOMMutationObserver implements ObserverClass {
           }
         }
 
+        if (nodeData.html === null) return
+
         record.add.push(nodeData)
       }
     )
@@ -165,12 +168,15 @@ export default class DOMMutationObserver implements ObserverClass {
 
         switch (node.nodeName) {
           case '#text': {
-            nodeData.html = target.nodeValue
+            nodeData.html = node.nodeValue
             break
           }
 
           default: {
             nodeData.target = getFridayIdByNode(node)
+            if (nodeData.target === null) {
+              console.log('TCL: node', node)
+            }
           }
         }
 
@@ -195,10 +201,11 @@ export default class DOMMutationObserver implements ObserverClass {
   }
 
   install() {
-    const MutationObserver =
-      window.MutationObserver || window.WebKitMutationObserver
+    const Observer =
+      (window as any).MutationObserver || (window as any).WebKitMutationObserver
+    console.log('TCL: install -> Observer', Observer)
 
-    this.observer = new MutationObserver((records: MutationRecord[]) => {
+    this.observer = new Observer((records: MutationRecord[]) => {
       const { onobserved } = this
 
       for (let record of records) {
@@ -216,6 +223,8 @@ export default class DOMMutationObserver implements ObserverClass {
       characterData: true,
       subtree: true
     })
+
+    _log('mutation installed')
 
     this.active = true
   }

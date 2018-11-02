@@ -1,6 +1,6 @@
-import { ID_KEY } from 'constants'
+import { ID_KEY } from '../constants'
 import { ElementX } from 'models/friday'
-import { _newuuid } from './helpers';
+import { _newuuid } from './helpers'
 
 /**
  * 1.Store initial document string
@@ -8,7 +8,10 @@ import { _newuuid } from './helpers';
  * 3.Add / Remove fridayId
  **/
 class FridayDocumentMachine {
-  public map: Map<HTMLElement | Element | Node | EventTarget, string> = new Map()
+  public map: Map<
+    HTMLElement | Element | Node | EventTarget,
+    string
+  > = new Map()
   public initialDocument: string
 
   constructor() {
@@ -19,7 +22,7 @@ class FridayDocumentMachine {
     console.time('[Doc buffer]: ')
 
     // buffer every node in the Map
-    Array.from(document.all).forEach(this.addOneNode2Map)
+    Array.from(document.all).forEach(this.addOneNode2Map.bind(this))
 
     this.initialDocument = document.documentElement.outerHTML
 
@@ -41,15 +44,17 @@ class FridayDocumentMachine {
     node.removeAttribute(ID_KEY)
   }
 
-  addOneNode2Map(node: ElementX): string {
+  private addOneNode2Map = (node: ElementX): string => {
     let fridayId = this.map.get(node) || _newuuid()
     this.map.set(node, fridayId)
+
     this.markNode(node, fridayId)
+
     return fridayId
   }
 
   // if document have new node, use this method because that node may have childElement
-  storeNewNode({
+  public storeNewNode = ({
     node,
     beforeUnmark,
     afterUnmark
@@ -57,7 +62,7 @@ class FridayDocumentMachine {
     node: ElementX
     beforeUnmark?: (node: ElementX, id: string) => void
     afterUnmark?: (node: ElementX, id: string) => void
-  }): void {
+  }): void => {
     const { addOneNode2Map } = this
     const fridayId = addOneNode2Map(node)
 
@@ -66,14 +71,17 @@ class FridayDocumentMachine {
       Array.from(node.children).forEach(addOneNode2Map)
     }
 
-    beforeUnmark(node, fridayId)
+    beforeUnmark && beforeUnmark(node, fridayId)
+
     this.unmarkNode(node)
-    afterUnmark(node, fridayId)
+
+    afterUnmark && afterUnmark(node, fridayId)
   }
 
   // get fridayId from map by node
-  getFridayIdByNode(node: ElementX | EventTarget): string {
-    return this.map.get(node)
+  public getFridayIdByNode = (node: ElementX | EventTarget): string => {
+    // return this.map.get(node)
+    return (node.tagName || node.nodeValue) + node.className
   }
 }
 

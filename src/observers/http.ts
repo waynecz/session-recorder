@@ -6,7 +6,7 @@ import {
   HttpEndRecord,
   HttpEndTypes
 } from 'models/observers/http'
-import { _replace, _original, _newuuid } from 'tools/helpers'
+import { _replace, _original, _newuuid, _log } from 'tools/helpers'
 import FridayWrappedXMLHttpRequest from 'models/friday'
 import { isFunction } from 'tools/is'
 
@@ -20,7 +20,7 @@ export default class HttpObserver implements ObserverClass {
   }
   public xhrMap: Map<string, HttpStartRecord> = new Map()
 
-  constructor(public onobserved, options: boolean | HttpObserveOptions) {
+  constructor(public onobserved, options?: boolean | HttpObserveOptions) {
     if (options === false) return
 
     Object.assign(this.options, options)
@@ -190,6 +190,8 @@ export default class HttpObserver implements ObserverClass {
           _self.onobserved(endRecord)
         }
 
+        // TODO: hijack xhr.onerror, xhr.onabort, xhr.ontimeout
+
         if (
           'onreadystatechange' in thisXHR &&
           isFunction(thisXHR.onreadystatechange)
@@ -242,7 +244,10 @@ export default class HttpObserver implements ObserverClass {
       this.hijackXHR()
     }
 
-    this.active = true
+    _log('http installed!')
+
+    // TODO: specify active status to beacon-actived, fetch-actived...
+    this.active = true 
   }
 
   uninstall(): void {

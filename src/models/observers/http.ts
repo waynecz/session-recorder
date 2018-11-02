@@ -10,13 +10,15 @@ export enum HttpEndTypes {
   fetcherror = 'fetcherror',
   fetchend = 'fetchend',
   xhrerror = 'xhrerror',
+  xhrabort = 'xhrabort',
+  xhrtimeout = 'xhrtimeout',
   xhrend = 'xhrend',
 }
 
 export type HttpObserveOptions = {
-  beacon: boolean,
-  fetch: boolean,
-  xhr: boolean,
+  beacon?: boolean,
+  fetch?: boolean,
+  xhr?: boolean,
 }
 
 export interface HttpStartRecord extends Record {
