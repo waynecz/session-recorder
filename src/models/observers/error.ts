@@ -20,9 +20,10 @@ export type ErrorObserveOptions = {
 
 export interface ErrorRecord extends Record {
   type: ErrorTypes
-  file?: string
-  line?: string // `lineo:colno`, only did type is jserr
   msg: string
+   // fields below existedy only if type === jserr
+  file?: string
+  line?: string
   err?: any
   stack?: string
 }

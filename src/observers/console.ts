@@ -28,6 +28,8 @@ export default class ConsoleObserver implements ObserverClass {
   }
 
   install(): void {
+    const _self = this
+
     this.consoleLevels.forEach(
       (level: string): void => {
         if (!this.options[level]) return
@@ -42,7 +44,7 @@ export default class ConsoleObserver implements ObserverClass {
               msg: args
             }
 
-            this.onobserved(record)
+            _self.onobserved(record)
 
             if (originalConsoleFunc) {
               originalConsoleFunc.call(console, ...args)

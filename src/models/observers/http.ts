@@ -6,27 +6,29 @@ export enum HttpRockets {
   xhr = 'xhr',
 }
 
+export enum HttpEndTypes {
+  fetcherror = 'fetcherror',
+  fetchend = 'fetchend',
+  xhrerror = 'xhrerror',
+  xhrend = 'xhrend',
+}
+
 export type HttpObserveOptions = {
   beacon: boolean,
   fetch: boolean,
   xhr: boolean,
 }
 
-export interface HttpRecord extends Record {
-  type: 'http'
-  r: HttpRockets
-  id: string
+export interface HttpStartRecord extends Record {
+  type: HttpRockets
+  id?: string // beacon record has no id
   url: string
+  input?: any[] // request arguments
   method?: string
-  status?: number
 }
-
-export interface HttpErrorRecord extends Record {
-  type: 'http'
-  r: HttpRockets
+export interface HttpEndRecord extends Record {
+  type: HttpEndTypes
   id: string
-  url: string
-  method?: string
   status?: number
+  errmsg?: any
 }
-

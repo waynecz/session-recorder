@@ -20,3 +20,10 @@ export interface MutationWindow extends Window {
 }
 
 export declare const window: MutationWindow
+
+
+export default interface FridayWrappedXMLHttpRequest extends XMLHttpRequest {
+  [key: string]: any
+  __id__?: string
+  __friday_own__?: string
+}

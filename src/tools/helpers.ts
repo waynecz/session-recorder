@@ -47,10 +47,12 @@ export function _replace(
 
   wrapped.__firday__ = true
   wrapped.__firday_original__ = original
+
+  source[name] = wrapped
 }
 
 /**
- * Reverse to original method
+ * Reverse to original function
  */
 export function _original(source: object, name: string): void {
   if (!(name in source) || !source[name].__firday__) return
