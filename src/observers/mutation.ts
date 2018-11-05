@@ -1,4 +1,4 @@
-import { ObserverClass } from 'models/observers'
+import { ObserverClass, ObserverConstructorParams } from 'models/observers'
 import {
   DOMMutationRecord,
   DOMMutationTypes,
@@ -12,18 +12,18 @@ import { _log } from 'tools/helpers'
 
 const { getFridayIdByNode } = FridayDocument
 
-window.DC = FridayDocument
-
 /**
  * Observe DOM change such as DOM-add/remove text-change attribute-change
  * and generate an Record
  **/
 export default class DOMMutationObserver implements ObserverClass {
   public name: string = 'DOMMutationObserver'
+  public onobserved
   private observer: MutationObserver
-  public active: boolean
+  public status: boolean
 
-  constructor(public onobserved) {
+  constructor({ onobserved }: ObserverConstructorParams) {
+    this.onobserved = onobserved
     this.install()
   }
 
@@ -97,7 +97,7 @@ export default class DOMMutationObserver implements ObserverClass {
     previousSibling,
     nextSibling
   }: MutationRecordX): DOMMutationRecord {
-    let record = {} as DOMMutationRecord
+    let record = { add: [], remove: [] } as DOMMutationRecord
     record.target = getFridayIdByNode(target)
 
     if (previousSibling) {
@@ -121,7 +121,6 @@ export default class DOMMutationObserver implements ObserverClass {
     this.nodesFilter(addedNodes).forEach(
       (node): void => {
         let nodeData = {} as NodeMutationData
-        record.add = []
 
         function getNodeHTML() {
           nodeData.html = node.outerHTML
@@ -141,7 +140,7 @@ export default class DOMMutationObserver implements ObserverClass {
             if (!parentElement) {
               // in case the node was the <html> element
               // TODO: find out when should the nodeData.index === -1
-              nodeData.html = nodeValue
+              nodeData.html = nodeValue || node.outerHTML
               break
             }
 
@@ -164,7 +163,6 @@ export default class DOMMutationObserver implements ObserverClass {
     this.nodesFilter(removedNodes).forEach(
       (node): void => {
         let nodeData = {} as NodeMutationData
-        record.remove = []
 
         switch (node.nodeName) {
           case '#text': {
@@ -174,15 +172,15 @@ export default class DOMMutationObserver implements ObserverClass {
 
           default: {
             nodeData.target = getFridayIdByNode(node)
-            if (nodeData.target === null) {
-              console.log('TCL: node', node)
-            }
           }
         }
 
         record.remove.push(nodeData)
       }
     )
+
+    // filter record which's addNodes and removeNode only contain SCRIPT or COMMENT
+    if (!record.remove.length && !record.add.length) return
 
     return record
   }
@@ -203,7 +201,6 @@ export default class DOMMutationObserver implements ObserverClass {
   install() {
     const Observer =
       (window as any).MutationObserver || (window as any).WebKitMutationObserver
-    console.log('TCL: install -> Observer', Observer)
 
     this.observer = new Observer((records: MutationRecord[]) => {
       const { onobserved } = this
@@ -226,7 +223,7 @@ export default class DOMMutationObserver implements ObserverClass {
 
     _log('mutation installed')
 
-    this.active = true
+    this.status = true
   }
 
   uninstall() {
@@ -235,6 +232,6 @@ export default class DOMMutationObserver implements ObserverClass {
       this.observer = null
     }
 
-    this.active = false
+    this.status = false
   }
 }

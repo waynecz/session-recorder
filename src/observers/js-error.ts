@@ -1,24 +1,30 @@
-import { ObserverClass } from 'models/observers'
+import { ObserverClass, ObserverConstructorParams } from 'models/observers'
 import {
   ErrorObserveOptions,
   ErrorRecord,
   ErrorTypes
 } from 'models/observers/error'
-import { _replace, _log } from 'tools/helpers'
+import { _replace, _log, _original } from 'tools/helpers'
 
 // TODO: error stack trace compution
 export default class JSErrorObserver implements ObserverClass {
   public name: string = 'JSErrorObserver'
+  public onobserved
   public options: ErrorObserveOptions = {
     jserror: true,
     unhandledrejection: true
   }
+  public status: ErrorObserveOptions = {
+    jserror: false,
+    unhandledrejection: false
+  }
   public active: boolean
 
-  constructor(public onobserved, options?: ErrorObserveOptions | boolean) {
+  constructor({ onobserved, options }: ObserverConstructorParams) {
     if (options === false) return
 
     Object.assign(this.options, options)
+    this.onobserved = onobserved
 
     this.install()
   }
@@ -27,11 +33,8 @@ export default class JSErrorObserver implements ObserverClass {
 
   private installGlobalerrorHandler(): void {
     const { getGlobalerrorReocrd } = this
+
     _replace(window, 'onerror', oldOnerrorHandler => {
-      /**
-       * "For historical reasons, different arguments are passed to window.onerror and element.onerror handlers"
-       * more: https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror#Syntax
-       **/
       const fridayOnerrorHandler = function(
         message: string | ErrorEvent,
         filename: any,
@@ -39,6 +42,11 @@ export default class JSErrorObserver implements ObserverClass {
         colno: any,
         error: Error | ErrorEvent
       ) {
+        /**
+         * "For historical reasons, different arguments are passed to window.onerror and element.onerror handlers"
+         *  more: - https://blog.sentry.io/2016/01/04/client-javascript-reporting-window-onerror
+         *       - https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror#Syntax
+         **/
         if (error && error instanceof ErrorEvent) {
           getGlobalerrorReocrd(error)
         } else if (message instanceof ErrorEvent) {
@@ -65,6 +73,7 @@ export default class JSErrorObserver implements ObserverClass {
 
   private installUnhanldledrejectionHandler(): void {
     const { getUnhandlerejectionRecord } = this
+
     _replace(
       window,
       'onunhandledrejection',
@@ -93,10 +102,13 @@ export default class JSErrorObserver implements ObserverClass {
       err
     }
 
-    this.onobserved(record)
+    const { onobserved } = this
+    onobserved && onobserved(record)
   }
 
-  private getUnhandlerejectionRecord = (errevt: PromiseRejectionEvent): void => {
+  private getUnhandlerejectionRecord = (
+    errevt: PromiseRejectionEvent
+  ): void => {
     let _errevt = { ...errevt }
 
     if (!_errevt) {
@@ -109,13 +121,15 @@ export default class JSErrorObserver implements ObserverClass {
       msg
     }
 
-    this.onobserved(record)
+    const { onobserved } = this
+    onobserved && onobserved(record)
   }
 
   install(): void {
     const { jserror, unhandledrejection } = this.options
     if (jserror) {
       this.installGlobalerrorHandler()
+      this.status.jserror = true
 
       // TODO: protect friday's onerror's hook by defineProperty
       Object.defineProperty(window, 'onerror', {
@@ -129,20 +143,23 @@ export default class JSErrorObserver implements ObserverClass {
 
     if (unhandledrejection) {
       this.installUnhanldledrejectionHandler()
+      this.status.unhandledrejection = true
     }
 
     _log('error installed!')
-
-    this.active = true
   }
 
   uninstall(): void {
-    window.removeEventListener('error', this.getGlobalerrorReocrd)
-    window.removeEventListener(
-      'unhandledrejection',
-      this.getUnhandlerejectionRecord
-    )
+    const { jserror, unhandledrejection } = this.options
 
-    this.active = false
+    if (jserror) {
+      _original(window, 'onerror')
+      this.status.jserror = false
+    }
+
+    if (unhandledrejection) {
+      _original(window, 'onunhandledrejection')
+      this.status.unhandledrejection = false
+    }
   }
 }

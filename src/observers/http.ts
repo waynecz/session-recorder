@@ -1,4 +1,4 @@
-import { ObserverClass } from 'models/observers'
+import { ObserverClass, ObserverConstructorParams } from 'models/observers'
 import {
   HttpObserveOptions,
   HttpRockets,
@@ -13,17 +13,25 @@ import { isFunction } from 'tools/is'
 export default class HttpObserver implements ObserverClass {
   public name: string = 'HttpObserver'
   public active: boolean
+  public onobserved
   public options: HttpObserveOptions = {
     beacon: true,
     fetch: true,
     xhr: true
+    // TODO: websocket support
+  }
+  public status: HttpObserveOptions = {
+    beacon: false,
+    fetch: false,
+    xhr: false
   }
   public xhrMap: Map<string, HttpStartRecord> = new Map()
 
-  constructor(public onobserved, options?: boolean | HttpObserveOptions) {
+  constructor({ onobserved, options }: ObserverConstructorParams) {
     if (options === false) return
 
     Object.assign(this.options, options)
+    this.onobserved = onobserved
 
     this.install()
   }
@@ -35,7 +43,7 @@ export default class HttpObserver implements ObserverClass {
   private hijackBeacon(): void {
     if (!this.isSupportBeacon()) return
 
-    const _self = this
+    const { onobserved } = this
 
     function beaconReplacement(originalBeacon) {
       return function(url: string, data): boolean {
@@ -49,7 +57,7 @@ export default class HttpObserver implements ObserverClass {
           url
         }
 
-        _self.onobserved(record)
+        onobserved && onobserved(record)
 
         return result
       }
@@ -65,7 +73,7 @@ export default class HttpObserver implements ObserverClass {
   private hijackFetch(): void {
     if (!this.isSupportFetch()) return
 
-    const _self = this
+    const { onobserved } = this
 
     function fetchReplacement(originalFetch) {
       return function(input: string | Request, config?: Request): void {
@@ -97,7 +105,7 @@ export default class HttpObserver implements ObserverClass {
         } as HttpStartRecord
 
         // record before fetch
-        _self.onobserved(startReocrd)
+        onobserved && onobserved(startReocrd)
 
         return (
           originalFetch
@@ -113,7 +121,7 @@ export default class HttpObserver implements ObserverClass {
 
               endReocrd.status = response.status
 
-              _self.onobserved(endReocrd)
+              onobserved && onobserved(endReocrd)
 
               return response
             })
@@ -125,7 +133,7 @@ export default class HttpObserver implements ObserverClass {
                 errmsg: message
               }
 
-              _self.onobserved(errRecord)
+              onobserved && onobserved(errRecord)
 
               throw error
             })
@@ -139,7 +147,8 @@ export default class HttpObserver implements ObserverClass {
   private hijackXHR() {
     if (!('XMLHttpRequest' in window)) return
 
-    const _self = this
+    const { onobserved } = this
+    const self = this
 
     function XHROpenReplacement(originalOpen) {
       return function(this: FridayWrappedXMLHttpRequest, method, url) {
@@ -157,7 +166,7 @@ export default class HttpObserver implements ObserverClass {
 
         this.__id__ = requestId
 
-        _self.xhrMap.set(requestId, startRecord)
+        self.xhrMap.set(requestId, startRecord)
 
         return originalOpen.apply(this, args)
       }
@@ -168,26 +177,27 @@ export default class HttpObserver implements ObserverClass {
         const thisXHR = this
         const { __id__: requestId, __friday_own__ } = thisXHR
 
-        let startRecord = _self.xhrMap.get(requestId)
+        let startRecord = self.xhrMap.get(requestId)
 
         // skip firday's own request
         if (startRecord && !__friday_own__) {
           startRecord.input = body
           // record before send
-          _self.onobserved(startRecord)
+          self.onobserved(startRecord)
         }
 
         function onreadystatechangeHandler(): void {
-          if (thisXHR.readyState === 4) {
-            if (thisXHR.__friday_own__) return
-          }
-          const endRecord: HttpEndRecord = {
-            type: HttpEndTypes.xhrend,
-            id: requestId,
-            status: thisXHR.status
-          }
+          if (this.readyState === 4) {
+            if (this.__friday_own__) return
 
-          _self.onobserved(endRecord)
+            const endRecord: HttpEndRecord = {
+              type: HttpEndTypes.xhrend,
+              id: requestId,
+              status: this.status
+            }
+
+            onobserved && onobserved(endRecord)
+          }
         }
 
         // TODO: hijack xhr.onerror, xhr.onabort, xhr.ontimeout
@@ -218,7 +228,7 @@ export default class HttpObserver implements ObserverClass {
             errmsg: message
           }
 
-          _self.onobserved(errRecord)
+          onobserved && onobserved(errRecord)
         }
       }
     }
@@ -234,20 +244,20 @@ export default class HttpObserver implements ObserverClass {
 
     if (beacon) {
       this.hijackBeacon()
+      this.status.beacon = true
     }
 
     if (fetch) {
       this.hijackFetch()
+      this.status.fetch = true
     }
 
     if (xhr) {
       this.hijackXHR()
+      this.status.xhr = true
     }
 
     _log('http installed!')
-
-    // TODO: specify active status to beacon-actived, fetch-actived...
-    this.active = true 
   }
 
   uninstall(): void {
@@ -255,16 +265,17 @@ export default class HttpObserver implements ObserverClass {
 
     if (beacon) {
       _original(window.navigator, 'sendBeacon')
+      this.status.beacon = false
     }
 
     if (fetch) {
       _original(window, 'fetch')
+      this.status.fetch = false
     }
 
     if (xhr) {
       this.hijackBeacon()
+      this.status.xhr = false
     }
-
-    this.active = false
   }
 }

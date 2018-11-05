@@ -12,7 +12,7 @@ export enum EventTypes {
 export type EventObserveOptions = {
   scroll?: boolean
   click?: boolean 
-  move?: boolean
+  mousemove?: boolean
   resize?: boolean
   form?: boolean
 }

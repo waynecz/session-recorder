@@ -1,4 +1,4 @@
-import { ObserverClass } from 'models/observers'
+import { ObserverClass, ObserverConstructorParams } from 'models/observers'
 import {
   ConsoleObserveOptions,
   ConsoleTypes,
@@ -10,7 +10,7 @@ import { _replace, _original, _log } from 'tools/helpers'
 export default class ConsoleObserver implements ObserverClass {
   public name: string = 'ConsoleObserver'
   private consoleLevels: string[] = Object.keys(ConsoleLevels)
-  public active: boolean
+  public onobserved
   public options: ConsoleObserveOptions = {
     info: true,
     error: true,
@@ -18,17 +18,25 @@ export default class ConsoleObserver implements ObserverClass {
     warn: true,
     debug: false
   }
+  public status: ConsoleObserveOptions = {
+    info: false,
+    error: false,
+    log: false,
+    warn: false,
+    debug: false
+  }
 
-  constructor(public onobserved, options?: ConsoleObserveOptions | boolean) {
+  constructor({ onobserved, options }: ObserverConstructorParams) {
     if (options === false) return
 
     Object.assign(this.options, options)
+    this.onobserved = onobserved
 
     this.install()
   }
 
   install(): void {
-    const _self = this
+    const { onobserved, status } = this
 
     this.consoleLevels.forEach(
       (level: string): void => {
@@ -44,7 +52,7 @@ export default class ConsoleObserver implements ObserverClass {
               msg: args
             }
 
-            _self.onobserved(record)
+            onobserved && onobserved(record)
 
             if (originalConsoleFunc) {
               originalConsoleFunc.call(console, ...args)
@@ -53,10 +61,11 @@ export default class ConsoleObserver implements ObserverClass {
         }
 
         _replace(console, level, consoleReplacement)
+
+        status[level] = true
       }
     )
     _log('console installed!')
-    this.active = true
   }
 
   uninstall(): void {
@@ -65,9 +74,9 @@ export default class ConsoleObserver implements ObserverClass {
         if (!this.options[level]) return
 
         _original(console, level)
+
+        status[level] = false
       }
     )
-
-    this.active = false
   }
 }

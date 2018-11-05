@@ -29,7 +29,7 @@ export function _newuuid(): string {
 }
 
 /**
- * Wrap a given method with a high-order function
+ * Wrap and replace a given method with a high-order function
  *
  * @param source The object that contains a method to be wrapped.
  * @param name The name of method to be wrapped
@@ -55,10 +55,12 @@ export function _replace(
     // if original func existed
     if (!(name in source) || original.__firday__) return
     doReplace()
+    return
   } else if (original === null || original === undefined) {
-    // such as window.onerror, it's initial function would be null
+    // such as window.onerror whose initial value would be null
     // in this case, do replace directly
     doReplace()
+    return
   }
 }
 
@@ -71,4 +73,33 @@ export function _original(source: object, name: string): void {
   const { __firday_original__ } = source[name]
 
   source[name] = __firday_original__
+}
+
+export function _parseURL(
+  href: string = location.href
+): {
+  host?: string
+  path?: string
+  protocol?: string
+  query?: string
+  fragment?: string
+  relative?: string
+} {
+  const match = href.match(
+    /^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$/
+  )
+
+  if (!match) return {}
+
+  const query = match[6] || ''
+  const fragment = match[8] || ''
+
+  return {
+    protocol: match[2],
+    host: match[4],
+    path: match[5],
+    query,
+    fragment,
+    relative: match[5] + query + fragment
+  }
 }

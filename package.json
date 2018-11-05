@@ -16,9 +16,9 @@
     "feedback",
     "heatmap",
     "analysis",
-    "uirecord & session replay"
+    "uirecord"
   ],
-  "author": "chengzhou.weng",
+  "author": "chengzhou.weng@ele.me",
   "license": "ISC",
   "devDependencies": {
     "awesome-typescript-loader": "^5.2.1",

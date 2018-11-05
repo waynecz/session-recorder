@@ -3,11 +3,11 @@ import { ElementX } from 'models/friday'
 import { _newuuid } from './helpers'
 
 /**
- * 1.Store initial document string
+ * 1.Store initial document string with mark
  * 2.Create Map<node, id> for every node in DOM
  * 3.Add / Remove fridayId
  **/
-class FridayDocumentMachine {
+class FridayDocumentMarker {
   public map: Map<
     HTMLElement | Element | Node | EventTarget,
     string
@@ -15,11 +15,10 @@ class FridayDocumentMachine {
   public initialDocument: string
 
   constructor() {
-    this.init()
   }
 
-  init(): void {
-    console.time('[Doc buffer]: ')
+  public init(): void {
+    console.time('[Doc buffer]')
 
     // buffer every node in the Map
     Array.from(document.all).forEach(this.addOneNode2Map.bind(this))
@@ -31,7 +30,7 @@ class FridayDocumentMachine {
       this.unmarkNode(node)
     })
 
-    console.timeEnd('[Doc buffer]: ')
+    console.timeEnd('[Doc buffer]')
   }
 
   // mark fridayId on non-textnode
@@ -80,11 +79,12 @@ class FridayDocumentMachine {
 
   // get fridayId from map by node
   public getFridayIdByNode = (node: ElementX | EventTarget): string => {
-    // return this.map.get(node)
-    return (node.tagName || node.nodeValue) + node.className
+    return this.map.get(node)
   }
 }
 
-const FridayDocument = new FridayDocumentMachine()
+const FridayDocument = new FridayDocumentMarker()
+
+;(window as any).__FDOCUMENT__ = FridayDocument
 
 export default FridayDocument

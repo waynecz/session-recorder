@@ -1,10 +1,16 @@
 export interface ObserverClass {
   name: string
-  active: boolean,
+  status: { [key: string]: boolean } | boolean
   options?: boolean | object
-  onobserved?(record: Record)
+
+  onobserved?(record: Record): void
   install(options?: object): void
   uninstall(): void
+}
+
+export interface ObserverConstructorParams {
+  onobserved: any
+  options?
 }
 
 export enum RecordTypes {

@@ -1,4 +1,4 @@
-import { ObserverClass } from 'models/observers'
+import { ObserverClass, ObserverConstructorParams } from 'models/observers'
 import { EventReocrd, EventTypes } from 'models/observers/event'
 import { EventObserveOptions, Listener } from 'models/observers/event'
 import { ElementX, FormELement } from 'models/friday'
@@ -8,37 +8,40 @@ import FridayDocument from 'tools/document'
 const { getFridayIdByNode } = FridayDocument
 
 /**
- * Observe scroll, click, mousemove, window resize, form change(input/textarea/radio etc.)
+ * Observe scroll, window resize, form change(input/textarea/radio etc.)
  * and produce an Record
  **/
 export default class EventObserver implements ObserverClass {
   public name: string = 'EventObserver'
-  private listeners: Listener[] = []
-  public active: boolean
+  public listeners: Listener[] = []
+  public onobserved
+  public options: EventObserveOptions = {
+    scroll: true,
+    resize: true,
+    form: true
+  }
+  public status: EventObserveOptions = {
+    scroll: false,
+    resize: false,
+    form: false
+  }
 
-  constructor(
-    public onobserved,
-    public readonly options: EventObserveOptions | boolean = {
-      scroll: true,
-      click: true,
-      move: true,
-      resize: true,
-      form: true
-    }
-  ) {
+  constructor({ onobserved, options }: ObserverConstructorParams) {
     if (options === false) return
+
+    Object.assign(this.options, options)
+    this.onobserved = onobserved
+
     this.install()
   }
 
   /**
    * @param option useCapture or AddEventListenerOptions
    */
-  private addListener = ({
-    target,
-    event,
-    callback,
-    options = false
-  }: Listener) => {
+  public addListener = (
+    { target, event, callback, options = false }: Listener,
+    cb?: () => void
+  ) => {
     target.addEventListener(event, callback, options)
 
     this.listeners.push({
@@ -46,6 +49,8 @@ export default class EventObserver implements ObserverClass {
       event,
       callback
     })
+
+    cb && cb()
   }
 
   /** Provide that Document's direction is `rtl`(default) */
@@ -73,7 +78,7 @@ export default class EventObserver implements ObserverClass {
     if (target === document || !target) {
       let { x, y } = this.getScrollPosition()
       record = { ...record, x, y }
-      onobserved(record)
+      onobserved && onobserved(record)
       return
     }
 
@@ -83,28 +88,15 @@ export default class EventObserver implements ObserverClass {
 
     record = { ...record, x, y, target: fridayId }
 
-    onobserved(record)
-  }
-
-  private getMouseClickRecord = (evt: MouseEvent): void => {
-    const { pageX: x, pageY: y } = evt
-    const record: EventReocrd = { type: EventTypes.click, x, y }
-
-    this.onobserved(record)
-  }
-
-  private getMouseMoveRecord = (evt: MouseEvent): void => {
-    const { pageX: x, pageY: y } = evt
-    const record: EventReocrd = { type: EventTypes.move, x, y }
-
-    this.onobserved(record)
+    onobserved && onobserved(record)
   }
 
   private getResizeRecord = (): void => {
     const { clientWidth: w, clientHeight: h } = document.documentElement
     const record: EventReocrd = { type: EventTypes.resize, w, h }
+    const { onobserved } = this
 
-    this.onobserved(record)
+    onobserved && onobserved(record)
   }
 
   private getFormChangeRecord = (evt: Event): void => {
@@ -133,15 +125,15 @@ export default class EventObserver implements ObserverClass {
       k,
       v
     }
+    const { onobserved } = this
 
-    this.onobserved(record)
+    onobserved && onobserved(record)
   }
 
   install(): void {
     const { addListener } = this
 
-    const { scroll, click, move, resize, form } = this
-      .options as EventObserveOptions
+    const { scroll, resize, form } = this.options
 
     if (scroll) {
       addListener({
@@ -150,24 +142,9 @@ export default class EventObserver implements ObserverClass {
         callback: _throttle(this.getScrollRecord),
         options: true
       })
+      this.status.scroll = true
       /** Non-event invoking in order to get initial document's scroll position */
       this.getScrollRecord()
-    }
-
-    if (click) {
-      addListener({
-        target: document,
-        event: 'click',
-        callback: this.getMouseClickRecord
-      })
-    }
-
-    if (move) {
-      addListener({
-        target: document,
-        event: 'mousemove',
-        callback: _throttle(this.getMouseMoveRecord, 1000)
-      })
     }
 
     if (resize) {
@@ -176,6 +153,7 @@ export default class EventObserver implements ObserverClass {
         event: 'resize',
         callback: _throttle(this.getResizeRecord)
       })
+      this.status.resize = true
       /** Get viewport size primitively */
       this.getResizeRecord()
     }
@@ -187,16 +165,23 @@ export default class EventObserver implements ObserverClass {
         callback: this.getFormChangeRecord,
         options: true
       })
+      this.status.form = true
     }
 
     _log('events installed!')
-    this.active = true
   }
 
   uninstall() {
+    const eventName2StatusKey = {
+      change: 'form'
+    }
+
     this.listeners.forEach(({ target, event, callback }) => {
       target.removeEventListener(event, callback)
+
+      const statusKey = eventName2StatusKey[event] || event
+
+      this.status[statusKey] = false
     })
-    this.active = false
   }
 }
