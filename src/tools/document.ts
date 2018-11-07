@@ -13,9 +13,9 @@ class FridayDocumentMarker {
     string
   > = new Map()
   public initialDocument: string
+  public installed: boolean = false
 
-  constructor() {
-  }
+  constructor() {}
 
   public init(): void {
     console.time('[Doc buffer]')
@@ -29,6 +29,8 @@ class FridayDocumentMarker {
     Array.from(document.all).forEach((node: HTMLElement) => {
       this.unmarkNode(node)
     })
+
+    this.installed = true
 
     console.timeEnd('[Doc buffer]')
   }
@@ -84,7 +86,6 @@ class FridayDocumentMarker {
 }
 
 const FridayDocument = new FridayDocumentMarker()
-
 ;(window as any).__FDOCUMENT__ = FridayDocument
 
 export default FridayDocument

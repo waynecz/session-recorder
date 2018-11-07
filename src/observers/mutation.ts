@@ -5,7 +5,6 @@ import {
   NodeMutationData
 } from 'models/observers/mutation'
 import { MutationRecordX } from 'models/friday'
-
 import { ID_KEY } from 'constants'
 import FridayDocument from 'tools/document'
 import { _log } from 'tools/helpers'
@@ -20,7 +19,9 @@ export default class DOMMutationObserver implements ObserverClass {
   public name: string = 'DOMMutationObserver'
   public onobserved
   private observer: MutationObserver
-  public status: boolean
+  public status = {
+    mutation: true
+  }
 
   constructor({ onobserved }: ObserverConstructorParams) {
     this.onobserved = onobserved
@@ -223,7 +224,7 @@ export default class DOMMutationObserver implements ObserverClass {
 
     _log('mutation installed')
 
-    this.status = true
+    this.status.mutation = true
   }
 
   uninstall() {
@@ -232,6 +233,6 @@ export default class DOMMutationObserver implements ObserverClass {
       this.observer = null
     }
 
-    this.status = false
+    this.status.mutation = false
   }
 }

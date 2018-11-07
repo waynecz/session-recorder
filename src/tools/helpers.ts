@@ -3,6 +3,7 @@ export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 export type Optional<T> = { [key in keyof T]?: T[key] }
 
 export const _log = console.log.bind(null, '[Friday]:')
+export const _warn = console.warn.bind(null, '[Friday]:')
 
 export function _throttle<T, K>(
   func: (T: T) => K,
@@ -102,4 +103,8 @@ export function _parseURL(
     fragment,
     relative: match[5] + query + fragment
   }
+}
+
+export function _seralize(obj: { [key: string]: any }): string {
+  return Object.entries(obj).map(([k, v]) => `${k}=${v}`).join('&')
 }

@@ -1,3 +1,5 @@
+import { Record } from "./observers";
+
 export type ElementX = HTMLElement | Element
 
 // MutationRecord's target is Node type that doesn't have `getAttribute`/tagName etc
@@ -25,5 +27,18 @@ export declare const window: MutationWindow
 export default interface FridayWrappedXMLHttpRequest extends XMLHttpRequest {
   [key: string]: any
   __id__?: string
-  __friday_own__?: string
+  __friday_own__?: boolean
+}
+
+export default interface Friday {
+
+}
+
+export default interface Recorder {
+  start(): void
+  end(): void
+  trace: {
+    ui: Record[]
+    mouse: Record[]
+  }
 }

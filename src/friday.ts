@@ -1,5 +1,7 @@
 import Recorder from 'recorder'
 import FridayDocument from 'tools/document'
+import { _warn } from 'tools/helpers'
+import { ajax } from 'tools/request'
 // import 'ui'
 
 class Friday {
@@ -7,31 +9,47 @@ class Friday {
     recorder: true,
     ui: true
   }
-
+  public recorder: Recorder
   public installed: boolean = false
 
   constructor(options?) {
     if (this.installed) {
-      console.warn('[Friday]: already installed')
+      _warn('[Friday]: already installed')
       return
     }
 
     Object.assign(this.options, options)
 
+    this.install()
+  }
+
+  /** Identify current user for this feedback */
+  public identify() {}
+
+  public startRecord() {
+    this.recorder.start()
+  }
+
+  public endRecord() {
+    this.recorder.end()
+  }
+
+  public async report() {
+    await ajax({
+      url: '://api.firday.ele.me',
+      data: this.recorder.trace,
+      method: 'POST'
+    })
+  }
+
+  private install() {
     if (this.options.recorder) {
-      ;(window as any).__FRIDAY_RECORDER__ = new Recorder()
+      this.recorder = new Recorder()
+      ;(window as any).__FRIDAY_RECORDER__ = this.recorder
     }
 
     FridayDocument.init()
   }
-
-  public identity() {}
-
-  public startRecord() {
-    
-  }
-
-  private install() {}
 }
 
 export default Friday
