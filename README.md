@@ -1,4 +1,4 @@
-# Friday 
+# WIP: User Actions Recorder 
 
 ## Features expected:
 
