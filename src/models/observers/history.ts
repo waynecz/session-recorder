@@ -1,8 +1,6 @@
 import { Record } from '.'
 
 export enum HistoryTypes {
-  push = 'push',
-  replace = 'replace',
   history = 'history'
 }
 export interface HistoryRecord extends Record {

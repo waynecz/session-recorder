@@ -7,7 +7,7 @@ import {
   HttpEndTypes
 } from 'models/observers/http'
 import { _replace, _original, _newuuid, _log } from 'tools/helpers'
-import FridayWrappedXMLHttpRequest from 'models/friday'
+import RecorderWrappedXMLHttpRequest from 'models'
 import { isFunction } from 'tools/is'
 
 export default class HttpObserver implements ObserverClass {
@@ -151,7 +151,7 @@ export default class HttpObserver implements ObserverClass {
     const self = this
 
     function XHROpenReplacement(originalOpen) {
-      return function(this: FridayWrappedXMLHttpRequest, method, url) {
+      return function(this: RecorderWrappedXMLHttpRequest, method, url) {
         const requestId = _newuuid()
 
         const args = [...arguments]
@@ -173,14 +173,14 @@ export default class HttpObserver implements ObserverClass {
     }
 
     function XHRSendReplacement(originalSend) {
-      return function(this: FridayWrappedXMLHttpRequest, body) {
+      return function(this: RecorderWrappedXMLHttpRequest, body) {
         const thisXHR = this
-        const { __id__: requestId, __friday_own__ } = thisXHR
+        const { __id__: requestId, __recorder_own__ } = thisXHR
 
         let startRecord = self.xhrMap.get(requestId)
 
         // skip firday's own request
-        if (startRecord && !__friday_own__) {
+        if (startRecord && !__recorder_own__) {
           startRecord.input = body
           // record before send
           self.onobserved(startRecord)
@@ -188,7 +188,7 @@ export default class HttpObserver implements ObserverClass {
 
         function onreadystatechangeHandler(): void {
           if (this.readyState === 4) {
-            if (this.__friday_own__) return
+            if (this.__recorder_own__) return
 
             const endRecord: HttpEndRecord = {
               type: HttpEndTypes.xhrend,

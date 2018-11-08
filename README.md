@@ -1,21 +1,27 @@
-# WIP: User Actions Recorder 
+# WIP: UI Recorder
 
-## Features expected:
+### Record:
 
-#### Basic
-+ [ ] UI record 
-+ [ ] Feedback
-+ [ ] Screenshot
++ [ x ] DOM mutation
++ [ x ] Network
++ [ x ] Error
++ [ x ] Mouse click / move,  Scroll
++ [ x ] Console
 
+### Output:
 
-#### Advanced
-+ [ ] Error capture
-+ [ ] Heatmap
-+ [ ] Integrate the Formhub to provide Survey
-+ [ ] Poll
-+ [ ] User guide
-+ [ ] Daily/Weekly Report
-+ [ ] Funnels
+```json
+{
+  "ui": [
+    { "t": 327, "add": [{ "html": "<div id=\"__tr-container__\"></div>" }], "target": 6, "type": "node" },
+    { "t": 33552, "type": "form", "target": 16, "k": "value", "v": "2312" },
+    { "t": 33592, "type": "attr", "target": 14, "attr": { "k": "class", "v": "a" } },
+    { "t": 33665, "type": "form", "target": 19, "k": "checked", "v": true }
+  ],
+  "mouse": [{ "t": 12742, "type": "move", "x": 38, "y": 510 }, { "t": 31798, "type": "click", "x": 71, "y": 13 }]
+}
+
+```
 
 ## Homogeneous products
 + [sessionstack](https://www.sessionstack.com/)

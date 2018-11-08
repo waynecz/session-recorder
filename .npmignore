@@ -1,0 +1,5 @@
+build
+.gitignore
+.npmrc
+CONTRIBUTING.md
+pacage-lock.json

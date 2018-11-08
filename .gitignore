@@ -1,5 +1,5 @@
 .rpt2_cache
 node_modules
 .idea
-dist/index.html
+dist
 .DS_Store

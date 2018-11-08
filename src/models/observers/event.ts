@@ -1,4 +1,4 @@
-import { ElementX } from "../friday";
+import { ElementX } from "..";
 import { Record } from ".";
 
 export enum EventTypes {
@@ -33,7 +33,7 @@ export interface EventReocrd extends Record {
   w?: number
   h?: number
   // form change
-  target?: string
+  target?: number
   k?: string
   v?: number | string
 }

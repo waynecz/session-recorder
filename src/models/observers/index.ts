@@ -13,11 +13,6 @@ export interface ObserverConstructorParams {
   options?
 }
 
-export enum RecordTypes {
-  event = 'event',
-  history = 'history'
-}
-
 export interface Record {
-  t?: number /** parseInt of performance.now() / 100 */
+  t?: number // time
 }

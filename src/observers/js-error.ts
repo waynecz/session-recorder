@@ -35,7 +35,7 @@ export default class JSErrorObserver implements ObserverClass {
     const { getGlobalerrorReocrd } = this
 
     _replace(window, 'onerror', oldOnerrorHandler => {
-      const fridayOnerrorHandler = function(
+      const recorderOnerrorHandler = function(
         message: string | ErrorEvent,
         filename: any,
         lineno: any,
@@ -67,7 +67,7 @@ export default class JSErrorObserver implements ObserverClass {
         }
       }
 
-      return fridayOnerrorHandler
+      return recorderOnerrorHandler
     })
   }
 
@@ -131,11 +131,11 @@ export default class JSErrorObserver implements ObserverClass {
       this.installGlobalerrorHandler()
       this.status.jserror = true
 
-      // TODO: protect friday's onerror's hook by defineProperty
+      // TODO: protect recorder's onerror's hook by defineProperty
       Object.defineProperty(window, 'onerror', {
         set(newHook) {
-          if (!newHook.__friday__) {
-            _log('friday error handler died!')
+          if (!newHook.__recorder__) {
+            _log('recorder error handler died!')
           }
         }
       })

@@ -24,14 +24,10 @@ export interface MutationWindow extends Window {
 export declare const window: MutationWindow
 
 
-export default interface FridayWrappedXMLHttpRequest extends XMLHttpRequest {
+export default interface RecorderWrappedXMLHttpRequest extends XMLHttpRequest {
   [key: string]: any
   __id__?: string
-  __friday_own__?: boolean
-}
-
-export default interface Friday {
-
+  __recorder_own__?: boolean
 }
 
 export default interface Recorder {

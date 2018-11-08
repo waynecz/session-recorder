@@ -1,11 +1,11 @@
 import { ObserverClass, ObserverConstructorParams } from 'models/observers'
 import { EventReocrd, EventTypes } from 'models/observers/event'
 import { EventObserveOptions, Listener } from 'models/observers/event'
-import { ElementX, FormELement } from 'models/friday'
+import { ElementX, FormELement } from 'models'
 import { _throttle, _log } from 'tools/helpers'
-import FridayDocument from 'tools/document'
+import RecorderDocument from 'tools/document'
 
-const { getFridayIdByNode } = FridayDocument
+const { getRecorderIdByNode } = RecorderDocument
 
 /**
  * Observe scroll, window resize, form change(input/textarea/radio etc.)
@@ -84,9 +84,9 @@ export default class EventObserver implements ObserverClass {
 
     let targetX = target as ElementX
     const { scrollLeft: x, scrollTop: y } = targetX
-    const fridayId = getFridayIdByNode(targetX)
+    const recorderId = getRecorderIdByNode(targetX)
 
-    record = { ...record, x, y, target: fridayId }
+    record = { ...record, x, y, target: recorderId }
 
     onobserved && onobserved(record)
   }
@@ -101,11 +101,11 @@ export default class EventObserver implements ObserverClass {
 
   private getFormChangeRecord = (evt: Event): void => {
     const { target } = evt
-    const fridayId = getFridayIdByNode(target)
+    const recorderId = getRecorderIdByNode(target)
 
     let k, v
 
-    if (!fridayId) return
+    if (!recorderId) return
 
     const itemsWhichKeyIsChecked = ['radio', 'checked']
 
@@ -121,7 +121,7 @@ export default class EventObserver implements ObserverClass {
 
     const record: EventReocrd = {
       type: EventTypes.form,
-      target: fridayId,
+      target: recorderId,
       k,
       v
     }

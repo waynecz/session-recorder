@@ -1,1 +1,1 @@
-export const ID_KEY = 'friday-id'
+export const ID_KEY = 'recorder-id'

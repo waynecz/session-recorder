@@ -4,12 +4,12 @@ import {
   DOMMutationTypes,
   NodeMutationData
 } from 'models/observers/mutation'
-import { MutationRecordX } from 'models/friday'
+import { MutationRecordX } from 'models'
 import { ID_KEY } from 'constants'
-import FridayDocument from 'tools/document'
+import RecorderDocument from 'tools/document'
 import { _log } from 'tools/helpers'
 
-const { getFridayIdByNode } = FridayDocument
+const { getRecorderIdByNode } = RecorderDocument
 
 /**
  * Observe DOM change such as DOM-add/remove text-change attribute-change
@@ -36,7 +36,7 @@ export default class DOMMutationObserver implements ObserverClass {
 
     switch (mutationRecord.type) {
       case 'attributes': {
-        // ignore fridayId mutate
+        // ignore recorderId mutate
         if (attributeName !== ID_KEY) return
 
         return this.getAttrReocrd(mutationRecord)
@@ -62,7 +62,7 @@ export default class DOMMutationObserver implements ObserverClass {
     target
   }: MutationRecordX): DOMMutationRecord {
     let record = { attr: {} } as DOMMutationRecord
-    record.target = getFridayIdByNode(target)
+    record.target = getRecorderIdByNode(target)
 
     record.type = DOMMutationTypes.attr
     record.attr.k = attributeName
@@ -74,7 +74,7 @@ export default class DOMMutationObserver implements ObserverClass {
   // when textNode's innerText change
   private getTextRecord({ target }: MutationRecordX): DOMMutationRecord {
     let record = {} as DOMMutationRecord
-    record.target = getFridayIdByNode(target)
+    record.target = getRecorderIdByNode(target)
 
     record.type = DOMMutationTypes.text
     // use testConent instend of innerText(non-standard),
@@ -99,14 +99,14 @@ export default class DOMMutationObserver implements ObserverClass {
     nextSibling
   }: MutationRecordX): DOMMutationRecord {
     let record = { add: [], remove: [] } as DOMMutationRecord
-    record.target = getFridayIdByNode(target)
+    record.target = getRecorderIdByNode(target)
 
     if (previousSibling) {
-      record.prev = getFridayIdByNode(previousSibling)
+      record.prev = getRecorderIdByNode(previousSibling)
     }
 
     if (nextSibling) {
-      record.next = getFridayIdByNode(nextSibling)
+      record.next = getRecorderIdByNode(nextSibling)
     }
 
     /** ------------------------------ Add or Remove nodes --------------------------------- */
@@ -147,7 +147,7 @@ export default class DOMMutationObserver implements ObserverClass {
 
             nodeData.index = this.getNodeIndex(parentElement, node)
 
-            FridayDocument.storeNewNode({
+            RecorderDocument.storeNewNode({
               node,
               beforeUnmark: getNodeHTML
             })
@@ -172,7 +172,7 @@ export default class DOMMutationObserver implements ObserverClass {
           }
 
           default: {
-            nodeData.target = getFridayIdByNode(node)
+            nodeData.target = getRecorderIdByNode(node)
           }
         }
 
@@ -182,6 +182,14 @@ export default class DOMMutationObserver implements ObserverClass {
 
     // filter record which's addNodes and removeNode only contain SCRIPT or COMMENT
     if (!record.remove.length && !record.add.length) return
+
+    if (!record.remove.length) {
+      delete record.remove
+    }
+
+    if (!record.add.length) {
+      delete record.add
+    }
 
     return record
   }

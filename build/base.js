@@ -9,7 +9,7 @@ module.exports = {
   context: resolve('src'),
 
   entry: {
-    friday: './index'
+    index: './index'
   },
 
   output: {
