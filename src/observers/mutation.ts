@@ -1,13 +1,13 @@
-import { ObserverClass, ObserverConstructorParams } from 'models/observers'
+import { ObserverClass, ObserverConstructorParams } from '../models/observers'
 import {
   DOMMutationRecord,
   DOMMutationTypes,
   NodeMutationData
-} from 'models/observers/mutation'
-import { MutationRecordX } from 'models'
-import { ID_KEY } from 'constants'
-import RecorderDocument from 'tools/document'
-import { _log } from 'tools/helpers'
+} from '../models/observers/mutation'
+import { MutationRecordX } from '../models'
+import { ID_KEY } from '../constants'
+import RecorderDocument from '../tools/document'
+import { _log } from '../tools/helpers'
 
 const { getRecorderIdByNode } = RecorderDocument
 

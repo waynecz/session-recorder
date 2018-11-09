@@ -1,10 +1,10 @@
-import { ObserverClass, ObserverConstructorParams } from 'models/observers'
+import { ObserverClass, ObserverConstructorParams } from '../models/observers'
 import {
   ErrorObserveOptions,
   ErrorRecord,
   ErrorTypes
-} from 'models/observers/error'
-import { _replace, _log, _original } from 'tools/helpers'
+} from '../models/observers/error'
+import { _replace, _log, _original } from '../tools/helpers'
 
 // TODO: error stack trace compution
 export default class JSErrorObserver implements ObserverClass {

@@ -1,31 +1,22 @@
 {
   "compilerOptions": {
-    "module": "es2015",
+    "module": "es6",
     "target": "es6",
+    "moduleResolution": "node",
     "declaration": true,
+    "pretty": true,
     "noImplicitAny": false,
     "noLib": false,
-    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "lib": ["dom", "es2017"],
     "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./src",
-    "paths": {
-      "models": ["./models"],
-      "models/*": ["./models/*"],
-
-      "observers": ["./observers"],
-      "observers/*": ["./observers/*"],
-
-      "tools": ["./tools"],
-      "tools/*": ["./tools/*"]
-    }
+    "outDir": "dist",
+    "baseUrl": "src",
+    "lib": ["dom", "es2017", "es2018"]
   },
   "include": ["src/**/*", "src/*"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "exclude": ["dist", "node_modules", "**/*.spec.ts"]
 }

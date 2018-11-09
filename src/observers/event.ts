@@ -1,9 +1,9 @@
-import { ObserverClass, ObserverConstructorParams } from 'models/observers'
-import { EventReocrd, EventTypes } from 'models/observers/event'
-import { EventObserveOptions, Listener } from 'models/observers/event'
-import { ElementX, FormELement } from 'models'
-import { _throttle, _log } from 'tools/helpers'
-import RecorderDocument from 'tools/document'
+import { ObserverClass, ObserverConstructorParams } from '../models/observers'
+import { EventReocrd, EventTypes } from '../models/observers/event'
+import { EventObserveOptions, Listener } from '../models/observers/event'
+import { ElementX, FormELement } from '../models'
+import { _throttle, _log } from '../tools/helpers'
+import RecorderDocument from '../tools/document'
 
 const { getRecorderIdByNode } = RecorderDocument
 

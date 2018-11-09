@@ -1,14 +1,14 @@
-import { Record, ObserverClass } from 'models/observers'
-import { _log, _warn } from 'tools/helpers'
+import { Record, ObserverClass } from './models/observers'
+import { _log, _warn } from './tools/helpers'
 
-import ConsoleObserver from 'observers/console'
-import EventObserver from 'observers/event'
-import HttpObserver from 'observers/http'
-import DOMMutationObserver from 'observers/mutation'
-import JSErrorObserver from 'observers/js-error'
-import HistoryObserver from 'observers/history'
-import MouseObserver from 'observers/mouse'
-import RecorderDocument from 'tools/document'
+import ConsoleObserver from './observers/console'
+import EventObserver from './observers/event'
+import HttpObserver from './observers/http'
+import DOMMutationObserver from './observers/mutation'
+import JSErrorObserver from './observers/js-error'
+import HistoryObserver from './observers/history'
+import MouseObserver from './observers/mouse'
+import RecorderDocument from './tools/document'
 
 export default class Recorder implements Recorder {
   public trace: {
@@ -28,6 +28,7 @@ export default class Recorder implements Recorder {
 
   public MAX_MINS: number = 30 // max record time length(second)
   public time: number = 0
+  public document: any
 
   public recording: boolean = false
 
@@ -51,7 +52,7 @@ export default class Recorder implements Recorder {
       return
     }
 
-    RecorderDocument.init()
+    this.document = RecorderDocument.init()
 
     console.time('[Recorder setup]')
     let { recordUI, recordMouse } = this
@@ -73,6 +74,8 @@ export default class Recorder implements Recorder {
 
     this.recording = true
     console.timeEnd('[Recorder setup]')
+
+    ;(window as any).__RECORDER__ = this
   }
 
   public end() {
@@ -89,6 +92,3 @@ export default class Recorder implements Recorder {
     this.recording = false
   }
 }
-
-;(window as any).__RECORDER__ = Recorder
-;(window as any).__RECORDER__.document = RecorderDocument

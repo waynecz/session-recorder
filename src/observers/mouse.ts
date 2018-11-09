@@ -1,7 +1,7 @@
-import { ObserverClass, ObserverConstructorParams } from 'models/observers'
-import { EventReocrd, EventTypes } from 'models/observers/event'
-import { EventObserveOptions, Listener } from 'models/observers/event'
-import { _throttle, _log } from 'tools/helpers'
+import { ObserverClass, ObserverConstructorParams } from '../models/observers'
+import { EventReocrd, EventTypes } from '../models/observers/event'
+import { EventObserveOptions, Listener } from '../models/observers/event'
+import { _throttle, _log } from '../tools/helpers'
 
 /**
  * Observe mouse behavior

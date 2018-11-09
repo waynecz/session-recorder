@@ -1,6 +1,6 @@
-import { ObserverClass } from 'models/observers'
-import { _original, _log, _parseURL, _replace } from 'tools/helpers'
-import { HistoryRecord, HistoryTypes } from 'models/observers/history'
+import { ObserverClass } from '../models/observers'
+import { _original, _log, _parseURL, _replace } from '../tools/helpers'
+import { HistoryRecord, HistoryTypes } from '../models/observers/history'
 
 export default class HistoryObserver implements ObserverClass {
   public name: string = 'HistoryObserver'

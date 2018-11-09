@@ -1,5 +1,7 @@
 # UI Recorder
 
+See also [Session-player](https://github.com/waynecz/session-player) for consume Recorder's data
+
 ### Record list:
 
 + [x] DOM mutation

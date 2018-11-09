@@ -1,5 +1,5 @@
 import { ID_KEY } from '../constants'
-import { ElementX } from 'models'
+import { ElementX } from '../models'
 
 /**
  * 1.Store initial document string with mark
@@ -17,7 +17,7 @@ class RecorderDocumentMarker {
 
   constructor() {}
 
-  public init(): void {
+  public init() {
     console.time('[Document cached]')
 
     // buffer every node in the Map
@@ -33,6 +33,8 @@ class RecorderDocumentMarker {
     this.installed = true
 
     console.timeEnd('[Document cached]')
+
+    return this
   }
 
   private newID(): number {

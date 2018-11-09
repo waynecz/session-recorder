@@ -33,6 +33,7 @@ export default interface RecorderWrappedXMLHttpRequest extends XMLHttpRequest {
 export default interface Recorder {
   start(): void
   end(): void
+  document: any
   trace: {
     ui: Record[]
     mouse: Record[]

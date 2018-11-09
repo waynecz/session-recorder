@@ -1,14 +1,14 @@
-import { ObserverClass, ObserverConstructorParams } from 'models/observers'
+import { ObserverClass, ObserverConstructorParams } from '../models/observers'
 import {
   HttpObserveOptions,
   HttpRockets,
   HttpStartRecord,
   HttpEndRecord,
   HttpEndTypes
-} from 'models/observers/http'
-import { _replace, _original, _newuuid, _log } from 'tools/helpers'
-import RecorderWrappedXMLHttpRequest from 'models'
-import { isFunction } from 'tools/is'
+} from '../models/observers/http'
+import { _replace, _original, _newuuid, _log } from '../tools/helpers'
+import RecorderWrappedXMLHttpRequest from '../models'
+import { isFunction } from '../tools/is'
 
 export default class HttpObserver implements ObserverClass {
   public name: string = 'HttpObserver'

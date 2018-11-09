@@ -1,8 +1,9 @@
 {
   "name": "@waynecz/ui-recorder",
-  "version": "0.0.1-alpha.7",
+  "version": "0.0.1-alpha.12",
   "description": "Record DOM mustation / error / network / mouse / scroll / console and so on.",
   "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "lint": "tslint './src/**/*.ts*' --format --force",
     "dev": "npx webpack-dev-server --inline --config build/dev.js",

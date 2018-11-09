@@ -4,6 +4,10 @@ const webpack = require('webpack')
 
 const productionConfig = merge(baseWebpackConfig, {
   mode: 'production',
+
+  optimization: {
+    minimize: false
+  },
   
   plugins: [
     new webpack.DefinePlugin({

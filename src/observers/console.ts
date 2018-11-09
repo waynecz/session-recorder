@@ -1,11 +1,11 @@
-import { ObserverClass, ObserverConstructorParams } from 'models/observers'
+import { ObserverClass, ObserverConstructorParams } from '../models/observers'
 import {
   ConsoleObserveOptions,
   ConsoleTypes,
   ConsoleRecord,
   ConsoleLevels
-} from 'models/observers/console'
-import { _replace, _original, _log } from 'tools/helpers'
+} from '../models/observers/console'
+import { _replace, _original, _log } from '../tools/helpers'
 
 export default class ConsoleObserver implements ObserverClass {
   public name: string = 'ConsoleObserver'
