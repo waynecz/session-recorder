@@ -179,7 +179,7 @@ export default class HttpObserver implements ObserverClass {
 
         let startRecord = self.xhrMap.get(requestId)
 
-        // skip firday's own request
+        // skip recorder's own request
         if (startRecord && !__recorder_own__) {
           startRecord.input = body
           // record before send

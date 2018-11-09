@@ -1,13 +1,5 @@
 import { Record } from '.'
 
-export enum ConsoleLevels {
-  info = 'info',
-  error = 'error',
-  log = 'log',
-  warn = 'warn',
-  debug = 'debug'
-}
-
 export enum ErrorTypes {
   jserr = 'jserr',
   unhandledrejection = 'unhandledrejection'

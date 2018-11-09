@@ -8,7 +8,7 @@ import DOMMutationObserver from 'observers/mutation'
 import JSErrorObserver from 'observers/js-error'
 import HistoryObserver from 'observers/history'
 import MouseObserver from 'observers/mouse'
-import RecorderDocument from 'tools/document';
+import RecorderDocument from 'tools/document'
 
 export default class Recorder implements Recorder {
   public trace: {
@@ -90,4 +90,5 @@ export default class Recorder implements Recorder {
   }
 }
 
-(window as any).__RECORDER__ = Recorder
+;(window as any).__RECORDER__ = Recorder
+;(window as any).__RECORDER__.document = RecorderDocument

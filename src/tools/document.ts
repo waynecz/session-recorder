@@ -91,6 +91,5 @@ class RecorderDocumentMarker {
 }
 
 const RecorderDocument = new RecorderDocumentMarker()
-;(window as any).__FRIDAY_DOCUMENT__ = RecorderDocument
 
 export default RecorderDocument

@@ -1,38 +1,31 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "declaration": false,
+    "module": "es2015",
+    "target": "es6",
+    "declaration": true,
     "noImplicitAny": false,
     "noLib": false,
+    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "target": "es6",
     "lib": ["dom", "es2017"],
     "sourceMap": true,
-    "allowJs": true,
     "outDir": "./dist",
     "baseUrl": "./src",
     "paths": {
-      "@models": ["src/models"],
-      "@models/*": ["src/models/*"],
-      "@recorder": ["src/recorder"],
-      "@recorder/*": ["src/recorder/*"],
+      "models": ["./models"],
+      "models/*": ["./models/*"],
 
-      "@services": ["src/services"],
-      "@services/*": ["src/services/*"],
+      "observers": ["./observers"],
+      "observers/*": ["./observers/*"],
 
-      "@styles/*": ["src/styles/*"],
-
-      "@tools": ["src/tools"],
-      "@tools/*": ["src/tools/*"],
-
-      "@ui": ["src/ui"],
-      "@ui/*": ["src/ui/*"]
+      "tools": ["./tools"],
+      "tools/*": ["./tools/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/*"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

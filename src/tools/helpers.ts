@@ -5,14 +5,20 @@ export type Optional<T> = { [key in keyof T]?: T[key] }
 export const _log = console.log.bind(null, '[Recorder]:')
 export const _warn = console.warn.bind(null, '[Recorder]:')
 
+export function _now(): number {
+  if (!window.performance) return Date.now()
+  // if user change local time, performance.now() would work accurate still
+  return Math.floor(performance.now())
+}
+
 export function _throttle<T, K>(
   func: (T: T) => K,
   wait: number = 100
 ): (T: T) => K {
-  let previous: number = Date.now()
+  let previous: number = _now()
 
   return function(...args: any[]): K {
-    const now = Date.now()
+    const now = _now()
     const restTime = now - previous
 
     if (restTime >= wait) {
@@ -46,15 +52,15 @@ export function _replace(
   function doReplace() {
     const wrapped = replacement(original)
 
-    wrapped.__firday__ = true
-    wrapped.__firday_original__ = original
+    wrapped.__recorder__ = true
+    wrapped.__recorder_original__ = original
 
     source[name] = wrapped
   }
 
   if (original) {
     // if original func existed
-    if (!(name in source) || original.__firday__) return
+    if (!(name in source) || original.__recorder__) return
     doReplace()
     return
   } else if (original === null || original === undefined) {
@@ -69,11 +75,11 @@ export function _replace(
  * Reverse to original function
  */
 export function _original(source: object, name: string): void {
-  if (!(name in source) || !source[name].__firday__) return
+  if (!(name in source) || !source[name].__recorder__) return
 
-  const { __firday_original__ } = source[name]
+  const { __recorder_original__ } = source[name]
 
-  source[name] = __firday_original__
+  source[name] = __recorder_original__
 }
 
 export function _parseURL(
