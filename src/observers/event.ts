@@ -5,7 +5,7 @@ import { ElementX, FormELement } from '../models'
 import { _throttle, _log } from '../tools/helpers'
 import RecorderDocument from '../tools/document'
 
-const { getRecorderIdByNode } = RecorderDocument
+const { getRecordIdByElement } = RecorderDocument
 
 /**
  * Observe scroll, window resize, form change(input/textarea/radio etc.)
@@ -84,7 +84,7 @@ export default class EventObserver implements ObserverClass {
 
     let targetX = target as ElementX
     const { scrollLeft: x, scrollTop: y } = targetX
-    const recorderId = getRecorderIdByNode(targetX)
+    const recorderId = getRecordIdByElement(targetX)
 
     record = { ...record, x, y, target: recorderId }
 
@@ -101,7 +101,7 @@ export default class EventObserver implements ObserverClass {
 
   private getFormChangeRecord = (evt: Event): void => {
     const { target } = evt
-    const recorderId = getRecorderIdByNode(target)
+    const recorderId = getRecordIdByElement(target)
 
     let k, v
 

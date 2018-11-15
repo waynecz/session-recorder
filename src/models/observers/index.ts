@@ -15,4 +15,5 @@ export interface ObserverConstructorParams {
 
 export interface Record {
   t?: number // time
+  type: string
 }

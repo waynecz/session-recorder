@@ -3,11 +3,16 @@ import { Record } from ".";
 
 export enum EventTypes {
   scroll = 'scroll',
-  move = 'move',
-  click = 'click',
   resize = 'resize',
   form = 'form'
 }
+
+export enum MouseTypes {
+
+  click = 'click',
+  move = 'move'
+}
+
 
 export type EventObserveOptions = {
   scroll?: boolean
@@ -26,7 +31,7 @@ export type Listener = {
 
 export interface EventReocrd extends Record {
   type: EventTypes
-  // click, move, scroll
+  // scroll
   x?: number
   y?: number
   // resize
@@ -36,4 +41,10 @@ export interface EventReocrd extends Record {
   target?: number
   k?: string
   v?: number | string
+}
+
+export interface MouseReocrd extends Record {
+  type: MouseTypes
+  x?: number
+  y?: number
 }

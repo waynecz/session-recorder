@@ -1,5 +1,5 @@
-import { Record, ObserverClass } from './models/observers'
-import { _log, _warn } from './tools/helpers'
+import { ObserverClass } from './models/observers'
+import { _log, _warn, _now } from './tools/helpers'
 
 import ConsoleObserver from './observers/console'
 import EventObserver from './observers/event'
@@ -11,12 +11,7 @@ import MouseObserver from './observers/mouse'
 import RecorderDocument from './tools/document'
 
 export default class Recorder implements Recorder {
-  public trace: {
-    [key: string]: Record[]
-  } = {
-    ui: [],
-    mouse: []
-  }
+  public trail: any[]
   public observers: { [key: string]: any } = {
     mutation: null,
     console: null,
@@ -27,23 +22,17 @@ export default class Recorder implements Recorder {
   }
 
   public MAX_MINS: number = 30 // max record time length(second)
-  public time: number = 0
+  public baseTime: number = 0
   public document: any
 
   public recording: boolean = false
 
   constructor() {}
 
-  private recordUI(record) {
+  private push2Trail(record) {
     if (!this.recording) return
-    record = { t: Date.now() - this.time, ...record }
-    this.trace.ui.push(record)
-  }
-
-  private recordMouse(record) {
-    if (!this.recording) return
-    record = { t: Date.now() - this.time, ...record }
-    this.trace.mouse.push(record)
+    record = { t: _now() - this.baseTime, ...record }
+    this.trail.push(record)
   }
 
   public start() {
@@ -55,26 +44,25 @@ export default class Recorder implements Recorder {
     this.document = RecorderDocument.init()
 
     console.time('[Recorder setup]')
-    let { recordUI, recordMouse } = this
-    recordUI = recordUI.bind(this)
-    recordMouse = recordMouse.bind(this)
+    let { push2Trail } = this
+    push2Trail = push2Trail.bind(this)
 
-    this.time = Date.now()
+    this.baseTime = _now()
 
-    this.observers.mutation = new DOMMutationObserver({ onobserved: recordUI })
-    this.observers.console = new ConsoleObserver({
-      onobserved: recordUI,
-      options: { log: false }
+    Object.assign(this.observers, {
+      mutation: new DOMMutationObserver({
+        onobserved: push2Trail
+      }),
+      console: new ConsoleObserver({ onobserved: push2Trail }),
+      event: new EventObserver({ onobserved: push2Trail }),
+      mouse: new MouseObserver({ onobserved: push2Trail }),
+      http: new HttpObserver({ onobserved: push2Trail }),
+      error: new JSErrorObserver({ onobserved: push2Trail }),
+      history: new HistoryObserver({ onobserved: push2Trail })
     })
-    this.observers.event = new EventObserver({ onobserved: recordUI })
-    this.observers.mouse = new MouseObserver({ onobserved: recordMouse })
-    this.observers.http = new HttpObserver({ onobserved: recordUI })
-    this.observers.error = new JSErrorObserver({ onobserved: recordUI })
-    this.observers.history = new HistoryObserver({ onobserved: recordUI })
 
     this.recording = true
     console.timeEnd('[Recorder setup]')
-
     ;(window as any).__RECORDER__ = this
   }
 

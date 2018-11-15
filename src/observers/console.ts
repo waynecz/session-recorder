@@ -14,7 +14,7 @@ export default class ConsoleObserver implements ObserverClass {
   public options: ConsoleObserveOptions = {
     info: true,
     error: true,
-    log: true,
+    log: false,
     warn: true,
     debug: false
   }

@@ -1,5 +1,5 @@
 import { ObserverClass, ObserverConstructorParams } from '../models/observers'
-import { EventReocrd, EventTypes } from '../models/observers/event'
+import { MouseReocrd, MouseTypes } from '../models/observers/event'
 import { EventObserveOptions, Listener } from '../models/observers/event'
 import { _throttle, _log } from '../tools/helpers'
 
@@ -46,7 +46,7 @@ export default class MouseObserver implements ObserverClass {
 
   private getMouseClickRecord = (evt: MouseEvent): void => {
     const { pageX: x, pageY: y } = evt
-    const record: EventReocrd = { type: EventTypes.click, x, y }
+    const record: MouseReocrd = { type: MouseTypes.click, x, y }
     const { onobserved } = this
 
     onobserved && onobserved(record)
@@ -54,7 +54,7 @@ export default class MouseObserver implements ObserverClass {
 
   private getMouseMoveRecord = (evt: MouseEvent): void => {
     const { pageX: x, pageY: y } = evt
-    const record: EventReocrd = { type: EventTypes.move, x, y }
+    const record: MouseReocrd = { type: MouseTypes.move, x, y }
     const { onobserved } = this
 
     onobserved && onobserved(record)
