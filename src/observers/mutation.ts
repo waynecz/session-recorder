@@ -9,7 +9,7 @@ import { ID_KEY } from '../constants'
 import RecorderDocument from '../tools/document'
 import { _log } from '../tools/helpers'
 
-const { getRecorderIdByNode } = RecorderDocument
+const { getRecordIdByElement } = RecorderDocument
 
 /**
  * Observe DOM change such as DOM-add/remove text-change attribute-change
@@ -37,7 +37,7 @@ export default class DOMMutationObserver implements ObserverClass {
     switch (mutationRecord.type) {
       case 'attributes': {
         // ignore recorderId mutate
-        if (attributeName !== ID_KEY) return
+        if (attributeName === ID_KEY) return
 
         return this.getAttrReocrd(mutationRecord)
       }
@@ -62,7 +62,7 @@ export default class DOMMutationObserver implements ObserverClass {
     target
   }: MutationRecordX): DOMMutationRecord {
     let record = { attr: {} } as DOMMutationRecord
-    record.target = getRecorderIdByNode(target)
+    record.target = getRecordIdByElement(target)
 
     record.type = DOMMutationTypes.attr
     record.attr.k = attributeName
@@ -74,7 +74,7 @@ export default class DOMMutationObserver implements ObserverClass {
   // when textNode's innerText change
   private getTextRecord({ target }: MutationRecordX): DOMMutationRecord {
     let record = {} as DOMMutationRecord
-    record.target = getRecorderIdByNode(target)
+    record.target = getRecordIdByElement(target)
 
     record.type = DOMMutationTypes.text
     // use testConent instend of innerText(non-standard),
@@ -86,7 +86,7 @@ export default class DOMMutationObserver implements ObserverClass {
 
   /**
    * @Either:
-   * invoke when node added or removed,
+   * when node added or removed,
    * @Or:
    * if a contenteditable textNode's text been all removed, type should be `childList`(remove #text),
    * later if you type/add some text in this empty textNode, the first mutation's type would be `childList`(add #text), fellows by `characterData`s
@@ -99,14 +99,14 @@ export default class DOMMutationObserver implements ObserverClass {
     nextSibling
   }: MutationRecordX): DOMMutationRecord {
     let record = { add: [], remove: [] } as DOMMutationRecord
-    record.target = getRecorderIdByNode(target)
+    record.target = getRecordIdByElement(target)
 
     if (previousSibling) {
-      record.prev = getRecorderIdByNode(previousSibling)
+      record.prev = getRecordIdByElement(previousSibling)
     }
 
     if (nextSibling) {
-      record.next = getRecorderIdByNode(nextSibling)
+      record.next = getRecordIdByElement(nextSibling)
     }
 
     /** ------------------------------ Add or Remove nodes --------------------------------- */
@@ -147,8 +147,8 @@ export default class DOMMutationObserver implements ObserverClass {
 
             nodeData.index = this.getNodeIndex(parentElement, node)
 
-            RecorderDocument.storeNewNode({
-              node,
+            RecorderDocument.bufferNewElement({
+              ele: node,
               beforeUnmark: getNodeHTML
             })
           }
@@ -172,7 +172,7 @@ export default class DOMMutationObserver implements ObserverClass {
           }
 
           default: {
-            nodeData.target = getRecorderIdByNode(node)
+            nodeData.target = getRecordIdByElement(node)
           }
         }
 

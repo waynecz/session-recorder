@@ -49,7 +49,7 @@ export default class HistoryObserver implements ObserverClass {
 
     _replace(window, 'onpopstate', function(originalHandler) {
       return function(this: History, ...args: any[]): void {
-        getHistoryRecord.call(self.lastHref, location.href)
+        getHistoryRecord.call(self, self.lastHref, location.href)
 
         originalHandler && originalHandler.apply(this, args)
       }
@@ -59,7 +59,7 @@ export default class HistoryObserver implements ObserverClass {
       return function(this: History, ...args: any[]): void {
         const url = args.length > 2 ? args[2] : undefined
 
-        if (url) getHistoryRecord(self.lastHref, String(url))
+        if (url) getHistoryRecord.call(self, self.lastHref, String(url))
 
         return originalMethod.apply(this, args)
       }
