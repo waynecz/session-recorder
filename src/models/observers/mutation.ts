@@ -7,8 +7,11 @@ export enum DOMMutationTypes {
 }
 
 export interface NodeMutationData {
+  /** recorderId, exist when node been removed */
+  target?: number 
+  remaining?: string // exist when textNode been removed
+  /** index and html here below only when it was an add operation */ 
   index?: number // node's index in parentElement, include textNodes
-  target?: number // node's recorderId, exist when node been removed
   html: string // addnode's html or text
 }
 
@@ -24,4 +27,5 @@ export interface DOMMutationRecord extends Record {
   remove?: NodeMutationData[]
   // when type is characterData
   text?: string
+  html?: string
 }

@@ -11,7 +11,7 @@ import MouseObserver from './observers/mouse'
 import RecorderDocument from './tools/document'
 
 export default class Recorder implements Recorder {
-  public trail: any[]
+  public trail: any[] = []
   public observers: { [key: string]: any } = {
     mutation: null,
     console: null,
@@ -29,7 +29,7 @@ export default class Recorder implements Recorder {
 
   constructor() {}
 
-  private push2Trail(record) {
+  private push2Trail = (record) => {
     if (!this.recording) return
     record = { t: _now() - this.baseTime, ...record }
     this.trail.push(record)
@@ -80,3 +80,5 @@ export default class Recorder implements Recorder {
     this.recording = false
   }
 }
+
+(window as any).Recorder = Recorder

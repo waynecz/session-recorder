@@ -20,7 +20,8 @@ class DocumentBuffer {
   public init() {
     console.time('[Document buffer]')
 
-    // buffer every node in the Map
+    // Buffer every element into the Map
+    // Note that textNodes wouldn't been included !!
     Array.from(document.all).forEach(this.buffer)
 
     this.initialDocument = document.documentElement.outerHTML
@@ -87,7 +88,7 @@ class DocumentBuffer {
   }
 
   // get recorderId from map by element
-  public getRecordIdByElement = (ele: ElementX | EventTarget): number => {
+  public getRecordIdByElement = (ele: ElementX | EventTarget): number | undefined => {
     return this.map.get(ele)
   }
 }

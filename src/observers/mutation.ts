@@ -64,6 +64,8 @@ export default class DOMMutationObserver implements ObserverClass {
     let record = { attr: {} } as DOMMutationRecord
     record.target = getRecordIdByElement(target)
 
+    if (record.target === undefined) return
+
     record.type = DOMMutationTypes.attr
     record.attr.k = attributeName
     record.attr.v = target.getAttribute(attributeName)
@@ -74,12 +76,43 @@ export default class DOMMutationObserver implements ObserverClass {
   // when textNode's innerText change
   private getTextRecord({ target }: MutationRecordX): DOMMutationRecord {
     let record = {} as DOMMutationRecord
+    record.type = DOMMutationTypes.text
+
     record.target = getRecordIdByElement(target)
 
-    record.type = DOMMutationTypes.text
-    // use testConent instend of innerText(non-standard),
-    // see also https://stackoverflow.com/questions/35213147/difference-between-textcontent-vs-innertext
-    record.text = target.textContent
+    // 比如文本修改是在一个 contenteditable 的 `元素A` 内发生，
+    // 并且 `元素A` 内有 textNode 和 element 同时存在，
+    // 当只修改某个 textNode 时，MutationObserver 给的 target 会指向这个 textNode，
+    // 所以 record.target 在上面代码中 getRecordIdByElement 时会取到 undefined (因为 document bufferer 字典内只缓存 element)，
+    // 这时我们将 record.target 指向 `元素A` ，
+    // record.html 取 `元素A` 的 innerHTML。
+    // --------------------------------------------------------------------------------------------------
+    // When the mutation happen with `elementA`,
+    // which contains not only textNode, also element inside.
+    // Note that MutationObserver will name the `target` to the textNode we modified,
+    // therefore, we should get undefined of `getRecordIdByElement(target)` (since document bufferer didn't buffer textNode).
+    // So we point record.target to `elementA`,
+    // set `record.html = elementA.innerHTML` at the same time
+    if (!record.target) {
+      const parentEle = getRecordIdByElement(target.parentElement)
+      // 如果这时候取不到 parentEle 或者 target.parentElement 为 null，则视该条记录作废
+      // 这种情况会在删除整个 textNode 时发生，可以忽略，
+      // 因为这个动作会额外的生成一个类型为 childList 的 MutationRecord
+      // 交给 this.getNodesRecord 处理就好
+      // ----------------------------------------------------------------
+      // if (parentEle === null), means the textNode has been removed,
+      // this mutation would produce a MutationRecord with type === 'childList',
+      // just leave it to this.getNodesRecord to handle :)
+      if (!parentEle) {
+        return
+      }
+      record.target = parentEle
+      record.html = target.parentElement.innerHTML
+    } else {
+      // use testConent instend of innerText(non-standard),
+      // see also https://stackoverflow.com/questions/35213147/difference-between-textcontent-vs-innertext
+      record.text = target.textContent
+    }
 
     return record
   }
@@ -129,9 +162,12 @@ export default class DOMMutationObserver implements ObserverClass {
 
         switch (node.nodeName) {
           case '#text': {
+            // add textNode
             // nodeValue: https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue
             nodeData.html = node.nodeValue
-            record.add.push(nodeData)
+            if (target.childNodes.length) {
+              nodeData.index = this.getNodeIndex(node.parentElement, node)
+            }
             break
           }
 
@@ -140,7 +176,6 @@ export default class DOMMutationObserver implements ObserverClass {
 
             if (!parentElement) {
               // in case the node was the <html> element
-              // TODO: find out when should the nodeData.index === -1
               nodeData.html = nodeValue || node.outerHTML
               break
             }
@@ -167,12 +202,15 @@ export default class DOMMutationObserver implements ObserverClass {
 
         switch (node.nodeName) {
           case '#text': {
-            nodeData.html = node.nodeValue
+            // 当删除一个 textNode 或 所有文本内容时
+            // when delete a whole textNode
+            nodeData.remaining = target.innerHTML
             break
           }
 
           default: {
             nodeData.target = getRecordIdByElement(node)
+            if (nodeData.target === undefined) return
           }
         }
 
@@ -182,6 +220,7 @@ export default class DOMMutationObserver implements ObserverClass {
 
     // filter record which's addNodes and removeNode only contain SCRIPT or COMMENT
     if (!record.remove.length && !record.add.length) return
+    if (record.target === undefined) return
 
     if (!record.remove.length) {
       delete record.remove

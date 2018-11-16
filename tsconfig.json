@@ -13,6 +13,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "sourceMap": true,
+    "removeComments": false,
     "outDir": "dist",
     "baseUrl": "src",
     "lib": ["dom", "es2017", "es2018"]

@@ -1,5 +1,3 @@
-import { Record } from "./observers";
-
 export type ElementX = HTMLElement | Element
 
 // MutationRecord's target is Node type that doesn't have `getAttribute`/tagName etc
@@ -34,8 +32,5 @@ export default interface Recorder {
   start(): void
   end(): void
   document: any
-  trace: {
-    ui: Record[]
-    mouse: Record[]
-  }
+  trail: any[]
 }
