@@ -6,8 +6,10 @@ export default class HistoryObserver implements ObserverClass {
   public name: string = 'HistoryObserver'
   public status: boolean = false
   private lastHref: string
+  public onobserved
 
-  constructor(public onobserved) {
+  constructor({ onobserved }) {
+    this.onobserved = onobserved
     this.install()
   }
 

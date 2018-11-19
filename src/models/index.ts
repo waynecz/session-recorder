@@ -27,10 +27,3 @@ export default interface RecorderWrappedXMLHttpRequest extends XMLHttpRequest {
   __id__?: string
   __recorder_own__?: boolean
 }
-
-export default interface Recorder {
-  start(): void
-  end(): void
-  document: any
-  trail: any[]
-}

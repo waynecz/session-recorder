@@ -10,7 +10,7 @@ import HistoryObserver from './observers/history'
 import MouseObserver from './observers/mouse'
 import RecorderDocument from './tools/document'
 
-export default class Recorder implements Recorder {
+export default class Recorder {
   public trail: any[] = []
   public observers: { [key: string]: any } = {
     mutation: null,
@@ -27,7 +27,9 @@ export default class Recorder implements Recorder {
 
   public recording: boolean = false
 
-  constructor() {}
+  constructor() {
+    this.document = RecorderDocument.init()
+  }
 
   private push2Trail = (record) => {
     if (!this.recording) return
@@ -35,13 +37,11 @@ export default class Recorder implements Recorder {
     this.trail.push(record)
   }
 
-  public start() {
+  public start = () => {
     if (this.recording) {
       _warn('record already started')
       return
     }
-
-    this.document = RecorderDocument.init()
 
     console.time('[Recorder setup]')
     let { push2Trail } = this
@@ -78,6 +78,10 @@ export default class Recorder implements Recorder {
       }
     )
     this.recording = false
+  }
+
+  public saveTrail(): void {
+    window.localStorage.setItem('trail', JSON.stringify(this.trail))
   }
 }
 

@@ -87,12 +87,11 @@ export default class DOMMutationObserver implements ObserverClass {
     // 这时我们将 record.target 指向 `元素A` ，
     // record.html 取 `元素A` 的 innerHTML。
     // --------------------------------------------------------------------------------------------------
-    // When the mutation happen with `elementA`,
-    // which contains not only textNode, also element inside.
-    // Note that MutationObserver will name the `target` to the textNode we modified,
+    // When the mutation happen with `elementA` which contains textNodes and element inside, like a contenteditable div element,
+    // it SHOULD been noted that MutationObserver will point the `target` to the textNode we modified,
     // therefore, we should get undefined of `getRecordIdByElement(target)` (since document bufferer didn't buffer textNode).
-    // So we point record.target to `elementA`,
-    // set `record.html = elementA.innerHTML` at the same time
+    // So we manually set record.target = `elementA`,
+    // and record.html = elementA.innerHTML at the same time
     if (!record.target) {
       const parentEle = getRecordIdByElement(target.parentElement)
       // 如果这时候取不到 parentEle 或者 target.parentElement 为 null，则视该条记录作废
@@ -155,11 +154,6 @@ export default class DOMMutationObserver implements ObserverClass {
     this.nodesFilter(addedNodes).forEach(
       (node): void => {
         let nodeData = {} as NodeMutationData
-
-        function getNodeHTML() {
-          nodeData.html = node.outerHTML
-        }
-
         switch (node.nodeName) {
           case '#text': {
             // add textNode
@@ -182,10 +176,11 @@ export default class DOMMutationObserver implements ObserverClass {
 
             nodeData.index = this.getNodeIndex(parentElement, node)
 
-            RecorderDocument.bufferNewElement({
-              ele: node,
-              beforeUnmark: getNodeHTML
-            })
+            RecorderDocument.bufferNewElement(node)
+
+            nodeData.html = node.outerHTML
+
+            RecorderDocument.unmark(node, true)
           }
         }
 
@@ -202,9 +197,14 @@ export default class DOMMutationObserver implements ObserverClass {
 
         switch (node.nodeName) {
           case '#text': {
+            const { parentElement } = node
             // 当删除一个 textNode 或 所有文本内容时
             // when delete a whole textNode
-            nodeData.remaining = target.innerHTML
+            if (parentElement) {
+              nodeData.index = Array.from(parentElement.childNodes).indexOf(node)
+            } else {
+              nodeData.remaining = target.innerHTML
+            }
             break
           }
 

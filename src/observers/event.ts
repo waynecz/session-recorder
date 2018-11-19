@@ -74,7 +74,7 @@ export default class EventObserver implements ObserverClass {
 
     let record = { type: EventTypes.scroll } as EventReocrd
 
-    // If target is docuemnt or Non-event invoking
+    // If 1. target is docuemnt / 2. Non-event invoking
     if (target === document || !target) {
       let { x, y } = this.getScrollPosition()
       record = { ...record, x, y }
