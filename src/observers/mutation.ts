@@ -156,6 +156,7 @@ export default class DOMMutationObserver implements ObserverClass {
         let nodeData = {} as NodeMutationData
         switch (node.nodeName) {
           case '#text': {
+            nodeData.type = 'text'
             // add textNode
             // nodeValue: https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue
             nodeData.html = node.nodeValue
@@ -166,6 +167,8 @@ export default class DOMMutationObserver implements ObserverClass {
           }
 
           default: {
+            nodeData.type = 'ele'
+
             const { parentElement, nodeValue } = node
 
             if (!parentElement) {
@@ -181,6 +184,7 @@ export default class DOMMutationObserver implements ObserverClass {
             nodeData.html = node.outerHTML
 
             RecorderDocument.unmark(node, true)
+
           }
         }
 
@@ -197,6 +201,7 @@ export default class DOMMutationObserver implements ObserverClass {
 
         switch (node.nodeName) {
           case '#text': {
+            nodeData.type = 'text'
             const { parentElement } = node
             // 当删除一个 textNode 或 所有文本内容时
             // when delete a whole textNode
@@ -209,6 +214,7 @@ export default class DOMMutationObserver implements ObserverClass {
           }
 
           default: {
+            nodeData.type = 'ele'
             nodeData.target = getRecordIdByElement(node)
             if (nodeData.target === undefined) return
           }

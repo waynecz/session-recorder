@@ -8,6 +8,7 @@ export enum DOMMutationTypes {
 
 export interface NodeMutationData {
   index?: number // node's index in parentElement, include textNodes, may exist when add or remove
+  type: 'text' | 'ele'
   /** target, exist when node been removed */
   target?: number 
   remaining?: string // exist when textNode been removed
