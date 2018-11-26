@@ -1,6 +1,6 @@
 {
   "name": "@waynecz/session-recorder",
-  "version": "0.0.1-beta.1",
+  "version": "0.0.1-beta.2",
   "description": "Record DOM mustation / error / network / mouse / scroll / console and so on.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -8,7 +8,7 @@
     "lint": "tslint './src/**/*.ts*' --format --force",
     "dev": "npx webpack-dev-server --inline --config build/dev.js",
     "build": "rm -rf dist && npx tsc",
-    "deploy": "npm run build && npm publish"
+    "deploy": "npm run build && npm publish --access=public"
   },
   "repository": {
     "type": "git",

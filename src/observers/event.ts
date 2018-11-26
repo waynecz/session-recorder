@@ -91,6 +91,7 @@ export default class EventObserver extends Observer implements ObserverExtension
   }
 
   private getResizeRecord = (): void => {
+    debugger
     const { clientWidth: w, clientHeight: h } = document.documentElement
     const record: EventReocrd = { type: EventTypes.resize, w, h }
     const { $emit } = this

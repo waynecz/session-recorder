@@ -103,6 +103,8 @@ export default class Recorder {
       return
     }
 
+    this.recording = true
+
     Object.entries(this.observers).forEach(
       ([_, observer]: [string, ObserverExtensionClass]) => {
         observer.install()
@@ -110,8 +112,7 @@ export default class Recorder {
     )
 
     this.baseTime = _now()
-
-    this.recording = true
+    
     ;(window as any).__SESSION_RECORDER__ = this
   }
 
@@ -130,7 +131,7 @@ export default class Recorder {
     this.recording = false
   }
 
-  public saveTrail(): void {
+  public saveTrail2LocalStorage(): void {
     window.localStorage.setItem('trail', JSON.stringify(this.trail))
   }
 }
