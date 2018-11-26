@@ -1,4 +1,4 @@
-import { ObserverClass } from './models/observers'
+import { ObserverExtensionClass, ObserverClass } from './models/observers'
 import { _log, _warn, _now } from './tools/helpers'
 
 import ConsoleObserver from './observers/console'
@@ -9,6 +9,7 @@ import JSErrorObserver from './observers/js-error'
 import HistoryObserver from './observers/history'
 import MouseObserver from './observers/mouse'
 import RecorderDocument from './tools/document'
+import { RecorderOptions } from './models'
 
 export default class Recorder {
   public trail: any[] = []
@@ -21,17 +22,76 @@ export default class Recorder {
     history: null
   }
 
-  public MAX_MINS: number = 30 // max record time length(second)
+  public MAX_MINS: number = 60000 // max record length(ms)
   public baseTime: number = 0
   public document: any
+  public options: RecorderOptions = {
+    mutation: true,
+    history: true,
+    error: {
+      jserror: true,
+      unhandledrejection: true
+    },
+    console: {
+      info: true,
+      error: true,
+      log: false,
+      warn: true,
+      debug: false
+    },
+    event: {
+      scroll: true,
+      resize: true,
+      form: true
+    },
+    http: {
+      xhr: true,
+      fetch: true,
+      beacon: true
+    },
+    mouse: {
+      click: true,
+      mousemove: false
+    }
+  }
 
   public recording: boolean = false
 
-  constructor() {
+  constructor(options?: RecorderOptions) {
+    if (options) {
+      Object.assign(this.options, options)
+    }
+
+    const {
+      mutation,
+      history,
+      http,
+      event,
+      error,
+      console,
+      mouse
+    } = this.options
+
+    Object.assign(this.observers, {
+      mutation: new DOMMutationObserver(mutation),
+      console: new ConsoleObserver(console),
+      event: new EventObserver(event),
+      mouse: new MouseObserver(mouse),
+      http: new HttpObserver(http),
+      error: new JSErrorObserver(error),
+      history: new HistoryObserver(history)
+    })
+
+    Object.entries(this.observers).forEach(
+      ([_, observer]: [string, ObserverClass]) => {
+        observer.$on('observed', this.push2Trail.bind(this))
+      }
+    )
+
     this.document = RecorderDocument.init()
   }
 
-  private push2Trail = (record) => {
+  private push2Trail = record => {
     if (!this.recording) return
     record = { t: _now() - this.baseTime, ...record }
     this.trail.push(record)
@@ -43,27 +103,16 @@ export default class Recorder {
       return
     }
 
-    console.time('[Recorder setup]')
-    let { push2Trail } = this
-    push2Trail = push2Trail.bind(this)
+    Object.entries(this.observers).forEach(
+      ([_, observer]: [string, ObserverExtensionClass]) => {
+        observer.install()
+      }
+    )
 
     this.baseTime = _now()
 
-    Object.assign(this.observers, {
-      mutation: new DOMMutationObserver({
-        onobserved: push2Trail
-      }),
-      console: new ConsoleObserver({ onobserved: push2Trail }),
-      event: new EventObserver({ onobserved: push2Trail }),
-      mouse: new MouseObserver({ onobserved: push2Trail }),
-      http: new HttpObserver({ onobserved: push2Trail }),
-      error: new JSErrorObserver({ onobserved: push2Trail }),
-      history: new HistoryObserver({ onobserved: push2Trail })
-    })
-
     this.recording = true
-    console.timeEnd('[Recorder setup]')
-    ;(window as any).__RECORDER__ = this
+    ;(window as any).__SESSION_RECORDER__ = this
   }
 
   public end() {
@@ -73,10 +122,11 @@ export default class Recorder {
     }
     // walk and uninstall observers
     Object.entries(this.observers).forEach(
-      ([_, observer]: [string, ObserverClass]) => {
+      ([_, observer]: [string, ObserverExtensionClass]) => {
         observer.uninstall()
       }
     )
+
     this.recording = false
   }
 
@@ -85,4 +135,4 @@ export default class Recorder {
   }
 }
 
-(window as any).Recorder = Recorder
+;(window as any).Recorder = Recorder

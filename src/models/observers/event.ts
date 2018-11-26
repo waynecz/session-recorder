@@ -13,11 +13,14 @@ export enum MouseTypes {
   move = 'move'
 }
 
+export type MouseObserverOptions = {
+  click?: boolean 
+  mousemove?: boolean
+}
+
 
 export type EventObserveOptions = {
   scroll?: boolean
-  click?: boolean 
-  mousemove?: boolean
   resize?: boolean
   form?: boolean
 }

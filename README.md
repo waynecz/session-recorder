@@ -1,6 +1,6 @@
-# UI Recorder
+# Session Recorder
 
-> Note this repo is still processing. Besides, happy to see PR / issue
+> Note this repo is still processing. DO NOT USE IN PRODUCTION!
 
 See also [Session-Player(developing)](https://github.com/waynecz/session-player) for consume Recorder's data
 
@@ -34,7 +34,7 @@ See also [Session-Player(developing)](https://github.com/waynecz/session-player)
 
 ### Code intergration:
 ```javascript
-import Recorder from '@wayne/ui-recorder'
+import Recorder from '@wayne/session-recorder'
 
 const myReocrder = new Recorder()
 

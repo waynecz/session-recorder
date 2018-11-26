@@ -1,4 +1,4 @@
-import { ObserverClass, ObserverConstructorParams } from '../models/observers'
+import { ObserverExtensionClass } from '../models/observers'
 import {
   ConsoleObserveOptions,
   ConsoleTypes,
@@ -6,11 +6,11 @@ import {
   ConsoleLevels
 } from '../models/observers/console'
 import { _replace, _original, _log } from '../tools/helpers'
+import Observer from './';
 
-export default class ConsoleObserver implements ObserverClass {
+export default class ConsoleObserver extends Observer implements ObserverExtensionClass {
   public name: string = 'ConsoleObserver'
   private consoleLevels: string[] = Object.keys(ConsoleLevels)
-  public onobserved
   public options: ConsoleObserveOptions = {
     info: true,
     error: true,
@@ -26,17 +26,15 @@ export default class ConsoleObserver implements ObserverClass {
     debug: false
   }
 
-  constructor({ onobserved, options }: ObserverConstructorParams) {
+  constructor(options: ConsoleObserveOptions | boolean) {
+    super()
     if (options === false) return
 
     Object.assign(this.options, options)
-    this.onobserved = onobserved
-
-    this.install()
   }
 
-  install(): void {
-    const { onobserved, status } = this
+  public install(): void {
+    const { status, $emit } = this
 
     this.consoleLevels.forEach(
       (level: string): void => {
@@ -52,7 +50,7 @@ export default class ConsoleObserver implements ObserverClass {
               msg: args
             }
 
-            onobserved && onobserved(record)
+            $emit('observed', record)
 
             if (originalConsoleFunc) {
               originalConsoleFunc.call(console, ...args)
@@ -68,7 +66,7 @@ export default class ConsoleObserver implements ObserverClass {
     _log('console installed!')
   }
 
-  uninstall(): void {
+  public uninstall(): void {
     this.consoleLevels.forEach(
       (level: string): void => {
         if (!this.options[level]) return

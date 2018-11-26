@@ -1,32 +1,30 @@
-import { ObserverClass, ObserverConstructorParams } from '../models/observers'
+import { ObserverExtensionClass } from '../models/observers'
 import { MouseReocrd, MouseTypes } from '../models/observers/event'
-import { EventObserveOptions, Listener } from '../models/observers/event'
+import { MouseObserverOptions, Listener } from '../models/observers/event'
 import { _throttle, _log } from '../tools/helpers'
+import Observer from './';
 
 /**
  * Observe mouse behavior
  * and produce an Record
  **/
-export default class MouseObserver implements ObserverClass {
+export default class MouseObserver extends Observer implements ObserverExtensionClass {
   public name: string = 'MouseObserver'
   public listeners: Listener[] = []
-  public onobserved
-  public options: EventObserveOptions = {
+  public options: MouseObserverOptions = {
     click: true,
     mousemove: true
   }
-  public status: EventObserveOptions = {
+  public status: MouseObserverOptions = {
     click: false,
     mousemove: false
   }
 
-  constructor({ onobserved, options }: ObserverConstructorParams) {
+  constructor(options: MouseObserverOptions | boolean) {
+    super()
     if (options === false) return
 
     Object.assign(this.options, options)
-    this.onobserved = onobserved
-
-    this.install()
   }
 
   private addListener = (
@@ -47,20 +45,20 @@ export default class MouseObserver implements ObserverClass {
   private getMouseClickRecord = (evt: MouseEvent): void => {
     const { pageX: x, pageY: y } = evt
     const record: MouseReocrd = { type: MouseTypes.click, x, y }
-    const { onobserved } = this
+    const { $emit } = this
 
-    onobserved && onobserved(record)
+    $emit('observed', record)
   }
 
   private getMouseMoveRecord = (evt: MouseEvent): void => {
     const { pageX: x, pageY: y } = evt
     const record: MouseReocrd = { type: MouseTypes.move, x, y }
-    const { onobserved } = this
+    const { $emit } = this
 
-    onobserved && onobserved(record)
+    $emit('observed', record)
   }
 
-  install(): void {
+  public install(): void {
     const { addListener } = this
 
     const { click, mousemove } = this.options
@@ -87,7 +85,7 @@ export default class MouseObserver implements ObserverClass {
     _log('mouse installed!')
   }
 
-  uninstall() {
+  public uninstall() {
     this.listeners.forEach(({ target, event, callback }) => {
       target.removeEventListener(event, callback)
 

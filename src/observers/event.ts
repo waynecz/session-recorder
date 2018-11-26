@@ -1,9 +1,10 @@
-import { ObserverClass, ObserverConstructorParams } from '../models/observers'
+import { ObserverExtensionClass } from '../models/observers'
 import { EventReocrd, EventTypes } from '../models/observers/event'
 import { EventObserveOptions, Listener } from '../models/observers/event'
 import { ElementX, FormELement } from '../models'
 import { _throttle, _log } from '../tools/helpers'
 import RecorderDocument from '../tools/document'
+import Observer from './'
 
 const { getRecordIdByElement } = RecorderDocument
 
@@ -11,10 +12,9 @@ const { getRecordIdByElement } = RecorderDocument
  * Observe scroll, window resize, form change(input/textarea/radio etc.)
  * and produce an Record
  **/
-export default class EventObserver implements ObserverClass {
+export default class EventObserver extends Observer implements ObserverExtensionClass {
   public name: string = 'EventObserver'
   public listeners: Listener[] = []
-  public onobserved
   public options: EventObserveOptions = {
     scroll: true,
     resize: true,
@@ -26,13 +26,12 @@ export default class EventObserver implements ObserverClass {
     form: false
   }
 
-  constructor({ onobserved, options }: ObserverConstructorParams) {
+  constructor(options: EventObserveOptions | boolean) {
+    super()
+
     if (options === false) return
 
     Object.assign(this.options, options)
-    this.onobserved = onobserved
-
-    this.install()
   }
 
   /**
@@ -70,7 +69,7 @@ export default class EventObserver implements ObserverClass {
 
   private getScrollRecord = (evt?: Event): void => {
     const { target } = evt || { target: document }
-    const { onobserved } = this
+    const { $emit } = this
 
     let record = { type: EventTypes.scroll } as EventReocrd
 
@@ -78,7 +77,7 @@ export default class EventObserver implements ObserverClass {
     if (target === document || !target) {
       let { x, y } = this.getScrollPosition()
       record = { ...record, x, y }
-      onobserved && onobserved(record)
+      $emit('observed', record)
       return
     }
 
@@ -88,15 +87,15 @@ export default class EventObserver implements ObserverClass {
 
     record = { ...record, x, y, target: recorderId }
 
-    onobserved && onobserved(record)
+    $emit('observed', record)
   }
 
   private getResizeRecord = (): void => {
     const { clientWidth: w, clientHeight: h } = document.documentElement
     const record: EventReocrd = { type: EventTypes.resize, w, h }
-    const { onobserved } = this
+    const { $emit } = this
 
-    onobserved && onobserved(record)
+    $emit('observed', record)
   }
 
   private getFormChangeRecord = (evt: Event): void => {
@@ -125,12 +124,12 @@ export default class EventObserver implements ObserverClass {
       k,
       v
     }
-    const { onobserved } = this
+    const { $emit } = this
 
-    onobserved && onobserved(record)
+    $emit('observed', record)
   }
 
-  install(): void {
+  public install(): void {
     const { addListener } = this
 
     const { scroll, resize, form } = this.options
@@ -171,7 +170,7 @@ export default class EventObserver implements ObserverClass {
     _log('events installed!')
   }
 
-  uninstall() {
+  public uninstall() {
     const eventName2StatusKey = {
       change: 'form'
     }

@@ -1,15 +1,15 @@
-import { ObserverClass, ObserverConstructorParams } from '../models/observers'
+import { ObserverExtensionClass } from '../models/observers'
 import {
   ErrorObserveOptions,
   ErrorRecord,
   ErrorTypes
 } from '../models/observers/error'
 import { _replace, _log, _original } from '../tools/helpers'
+import Observer from './';
 
 // TODO: error stack trace compution
-export default class JSErrorObserver implements ObserverClass {
+export default class JSErrorObserver extends Observer implements ObserverExtensionClass {
   public name: string = 'JSErrorObserver'
-  public onobserved
   public options: ErrorObserveOptions = {
     jserror: true,
     unhandledrejection: true
@@ -20,15 +20,15 @@ export default class JSErrorObserver implements ObserverClass {
   }
   public active: boolean
 
-  constructor({ onobserved, options }: ObserverConstructorParams) {
+  constructor(options: ErrorObserveOptions | boolean) {
+    super()
+
     if (options === false) return
 
     Object.assign(this.options, options)
-    this.onobserved = onobserved
-
-    this.install()
   }
 
+  // TODO: generate stack of an error which is acceptable for sentry
   public getStackTeace() {}
 
   private installGlobalerrorHandler(): void {
@@ -102,8 +102,9 @@ export default class JSErrorObserver implements ObserverClass {
       err
     }
 
-    const { onobserved } = this
-    onobserved && onobserved(record)
+    const { $emit } = this
+
+    $emit('observed', record)
   }
 
   private getUnhandlerejectionRecord = (
@@ -121,11 +122,12 @@ export default class JSErrorObserver implements ObserverClass {
       msg
     }
 
-    const { onobserved } = this
-    onobserved && onobserved(record)
+    const { $emit } = this
+
+    $emit('observed', record)
   }
 
-  install(): void {
+  public install(): void {
     const { jserror, unhandledrejection } = this.options
     if (jserror) {
       this.installGlobalerrorHandler()
@@ -149,7 +151,7 @@ export default class JSErrorObserver implements ObserverClass {
     _log('error installed!')
   }
 
-  uninstall(): void {
+  public uninstall(): void {
     const { jserror, unhandledrejection } = this.options
 
     if (jserror) {

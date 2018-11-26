@@ -1,4 +1,4 @@
-import { ObserverClass, ObserverConstructorParams } from '../models/observers'
+import { ObserverExtensionClass } from '../models/observers'
 import {
   HttpObserveOptions,
   HttpRockets,
@@ -7,10 +7,11 @@ import {
   HttpEndTypes
 } from '../models/observers/http'
 import { _replace, _original, _newuuid, _log } from '../tools/helpers'
-import RecorderWrappedXMLHttpRequest from '../models'
+import { RecorderWrappedXMLHttpRequest } from '../models'
 import { isFunction } from '../tools/is'
+import Observer from './';
 
-export default class HttpObserver implements ObserverClass {
+export default class HttpObserver extends Observer implements ObserverExtensionClass {
   public name: string = 'HttpObserver'
   public active: boolean
   public onobserved
@@ -27,13 +28,12 @@ export default class HttpObserver implements ObserverClass {
   }
   public xhrMap: Map<string, HttpStartRecord> = new Map()
 
-  constructor({ onobserved, options }: ObserverConstructorParams) {
+  constructor(options: HttpObserveOptions | boolean) {
+    super()
+
     if (options === false) return
 
     Object.assign(this.options, options)
-    this.onobserved = onobserved
-
-    this.install()
   }
 
   private isSupportBeacon(): boolean {
@@ -43,7 +43,7 @@ export default class HttpObserver implements ObserverClass {
   private hijackBeacon(): void {
     if (!this.isSupportBeacon()) return
 
-    const { onobserved } = this
+    const { $emit } = this
 
     function beaconReplacement(originalBeacon) {
       return function(url: string, data): boolean {
@@ -57,7 +57,7 @@ export default class HttpObserver implements ObserverClass {
           url
         }
 
-        onobserved && onobserved(record)
+        $emit('observed', record)
 
         return result
       }
@@ -73,7 +73,7 @@ export default class HttpObserver implements ObserverClass {
   private hijackFetch(): void {
     if (!this.isSupportFetch()) return
 
-    const { onobserved } = this
+    const { $emit } = this
 
     function fetchReplacement(originalFetch) {
       return function(input: string | Request, config?: Request): void {
@@ -105,7 +105,7 @@ export default class HttpObserver implements ObserverClass {
         } as HttpStartRecord
 
         // record before fetch
-        onobserved && onobserved(startReocrd)
+        $emit('observed', startReocrd)
 
         return (
           originalFetch
@@ -121,7 +121,7 @@ export default class HttpObserver implements ObserverClass {
 
               endReocrd.status = response.status
 
-              onobserved && onobserved(endReocrd)
+              $emit('observed', endReocrd)
 
               return response
             })
@@ -132,8 +132,8 @@ export default class HttpObserver implements ObserverClass {
                 id: requestId,
                 errmsg: message
               }
-
-              onobserved && onobserved(errRecord)
+              
+              $emit('observed', errRecord)
 
               throw error
             })
@@ -147,7 +147,7 @@ export default class HttpObserver implements ObserverClass {
   private hijackXHR() {
     if (!('XMLHttpRequest' in window)) return
 
-    const { onobserved } = this
+    const { $emit } = this
     const self = this
 
     function XHROpenReplacement(originalOpen) {
@@ -196,7 +196,7 @@ export default class HttpObserver implements ObserverClass {
               status: this.status
             }
 
-            onobserved && onobserved(endRecord)
+            $emit('observed', endRecord)
           }
         }
 
@@ -228,7 +228,7 @@ export default class HttpObserver implements ObserverClass {
             errmsg: message
           }
 
-          onobserved && onobserved(errRecord)
+          $emit('observed', errRecord)
         }
       }
     }
@@ -239,7 +239,7 @@ export default class HttpObserver implements ObserverClass {
     _replace(XHRProto, 'send', XHRSendReplacement)
   }
 
-  install(): void {
+  public install(): void {
     const { beacon, fetch, xhr } = this.options
 
     if (beacon) {
@@ -260,7 +260,7 @@ export default class HttpObserver implements ObserverClass {
     _log('http installed!')
   }
 
-  uninstall(): void {
+  public uninstall(): void {
     const { beacon, fetch, xhr } = this.options
 
     if (beacon) {

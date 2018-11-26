@@ -1,4 +1,4 @@
-import { ObserverClass, ObserverConstructorParams } from '../models/observers'
+import { ObserverExtensionClass } from '../models/observers'
 import {
   DOMMutationRecord,
   DOMMutationTypes,
@@ -8,6 +8,7 @@ import { MutationRecordX } from '../models'
 import { ID_KEY } from '../constants'
 import RecorderDocument from '../tools/document'
 import { _log } from '../tools/helpers'
+import Observer from './'
 
 const { getRecordIdByElement } = RecorderDocument
 
@@ -15,17 +16,18 @@ const { getRecordIdByElement } = RecorderDocument
  * Observe DOM change such as DOM-add/remove text-change attribute-change
  * and generate an Record
  **/
-export default class DOMMutationObserver implements ObserverClass {
+export default class DOMMutationObserver extends Observer
+  implements ObserverExtensionClass {
   public name: string = 'DOMMutationObserver'
-  public onobserved
   private observer: MutationObserver
   public status = {
     mutation: true
   }
 
-  constructor({ onobserved }: ObserverConstructorParams) {
-    this.onobserved = onobserved
-    this.install()
+  constructor(options: boolean) {
+    super()
+
+    if (options === false) return
   }
 
   private process(mutationRecord: MutationRecordX) {
@@ -184,7 +186,6 @@ export default class DOMMutationObserver implements ObserverClass {
             nodeData.html = node.outerHTML
 
             RecorderDocument.unmark(node, true)
-
           }
         }
 
@@ -206,7 +207,9 @@ export default class DOMMutationObserver implements ObserverClass {
             // 当删除一个 textNode 或 所有文本内容时
             // when delete a whole textNode
             if (parentElement) {
-              nodeData.index = Array.from(parentElement.childNodes).indexOf(node)
+              nodeData.index = Array.from(parentElement.childNodes).indexOf(
+                node
+              )
             } else {
               nodeData.remaining = target.innerHTML
             }
@@ -252,18 +255,18 @@ export default class DOMMutationObserver implements ObserverClass {
     return Array.from(parentElement.childNodes).indexOf(node)
   }
 
-  install() {
+  public install() {
     const Observer =
       (window as any).MutationObserver || (window as any).WebKitMutationObserver
 
     this.observer = new Observer((records: MutationRecord[]) => {
-      const { onobserved } = this
+      const { $emit } = this
 
       for (let record of records) {
         const DOMMutationRecord = this.process(record as MutationRecordX)
 
-        if (DOMMutationRecord && onobserved) {
-          onobserved(DOMMutationRecord)
+        if (DOMMutationRecord) {
+          $emit('observed', DOMMutationRecord)
         }
       }
     })
@@ -280,7 +283,7 @@ export default class DOMMutationObserver implements ObserverClass {
     this.status.mutation = true
   }
 
-  uninstall() {
+  public uninstall() {
     if (this.observer) {
       this.observer.disconnect()
       this.observer = null

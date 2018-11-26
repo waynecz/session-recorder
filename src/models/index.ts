@@ -1,3 +1,11 @@
+import { ConsoleObserveOptions } from './observers/console'
+import {
+  EventObserveOptions,
+  MouseObserverOptions
+} from './observers/event'
+import { HttpObserveOptions } from './observers/http'
+import { ErrorObserveOptions } from './observers/error'
+
 export type ElementX = HTMLElement | Element
 
 // MutationRecord's target is Node type that doesn't have `getAttribute`/tagName etc
@@ -22,8 +30,18 @@ export interface MutationWindow extends Window {
 export declare const window: MutationWindow
 
 
-export default interface RecorderWrappedXMLHttpRequest extends XMLHttpRequest {
+export interface RecorderWrappedXMLHttpRequest extends XMLHttpRequest {
   [key: string]: any
   __id__?: string
   __recorder_own__?: boolean
+}
+
+export interface RecorderOptions {
+  console?: ConsoleObserveOptions
+  event?: EventObserveOptions
+  mouse?: MouseObserverOptions
+  http?: HttpObserveOptions
+  error?: ErrorObserveOptions
+  history?: boolean
+  mutation?: boolean
 }

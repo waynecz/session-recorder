@@ -1,19 +1,20 @@
-import { ObserverClass } from '../models/observers'
+import { ObserverExtensionClass } from '../models/observers'
 import { _original, _log, _parseURL, _replace } from '../tools/helpers'
 import { HistoryRecord, HistoryTypes } from '../models/observers/history'
+import Observer from './'
 
-export default class HistoryObserver implements ObserverClass {
+export default class HistoryObserver extends Observer implements ObserverExtensionClass {
   public name: string = 'HistoryObserver'
   public status: boolean = false
   private lastHref: string
-  public onobserved
 
-  constructor({ onobserved }) {
-    this.onobserved = onobserved
-    this.install()
+  constructor(options: boolean) {
+    super()
+
+    if (options === false) return
   }
 
-  getHistoryRecord(from: string | undefined, to: string | undefined): void {
+  private getHistoryRecord(from: string | undefined, to: string | undefined): void {
     const parsedHref = _parseURL(location.href)
     const parsedTo = _parseURL(to)
     let parsedFrom = _parseURL(from)
@@ -31,11 +32,12 @@ export default class HistoryObserver implements ObserverClass {
       to: parsedTo.relative
     }
 
-    const { onobserved } = this
-    onobserved && onobserved(record)
+    const { $emit } = this
+
+    $emit('observed', record)
   }
 
-  isSupportHistory(): boolean {
+  private isSupportHistory(): boolean {
     return (
       'history' in window &&
       !!window.history.pushState &&
@@ -43,7 +45,7 @@ export default class HistoryObserver implements ObserverClass {
     )
   }
 
-  install(): void {
+  public install(): void {
     if (!this.isSupportHistory()) return
 
     const { getHistoryRecord } = this
@@ -74,7 +76,7 @@ export default class HistoryObserver implements ObserverClass {
     this.status = true
   }
 
-  uninstall(): void {
+  public uninstall(): void {
     _original(window, 'onpopstate')
     _original(window.history, 'pushState')
     _original(window.history, 'replaceState')

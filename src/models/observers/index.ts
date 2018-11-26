@@ -1,4 +1,4 @@
-export interface ObserverClass {
+export interface ObserverExtensionClass {
   name: string
   status: { [key: string]: boolean } | boolean
   options?: boolean | object
@@ -8,10 +8,13 @@ export interface ObserverClass {
   uninstall(): void
 }
 
-export interface ObserverConstructorParams {
-  onobserved: any
-  options?
+export interface ObserverClass {
+  queues: Map<string, Function[]>
+  $on(hook: string, action: Function): void
+  $off(hook: string, thisAction: Function): void
+  $emit(hook: string, ...args): void
 }
+
 
 export interface Record {
   t?: number // time
