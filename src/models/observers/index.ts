@@ -1,4 +1,4 @@
-export interface ObserverExtensionClass {
+export interface HighOrderObserver {
   name: string
   status: { [key: string]: boolean } | boolean
   options?: boolean | object
@@ -8,7 +8,7 @@ export interface ObserverExtensionClass {
   uninstall(): void
 }
 
-export interface ObserverClass {
+export interface BasicObserver {
   queues: Map<string, Function[]>
   $on(hook: string, action: Function): void
   $off(hook: string, thisAction: Function): void

@@ -1,16 +1,16 @@
-import { ObserverExtensionClass } from '../models/observers'
+import { HighOrderObserver } from '../models/observers'
 import {
   ErrorObserveOptions,
   ErrorRecord,
   ErrorTypes
 } from '../models/observers/error'
 import { _replace, _log, _original } from '../tools/helpers'
-import Observer from './';
+import BasicObserverClass from './';
 import { RECORDER_OPTIONS } from '../constants';
 
 // TODO: error stack trace compution
-export default class JSErrorObserver extends Observer implements ObserverExtensionClass {
-  public name: string = 'JSErrorObserver'
+export default class JSErrorObserverClass extends BasicObserverClass implements HighOrderObserver {
+  public name: string = 'JSErrorObserverClass'
   public options: ErrorObserveOptions = RECORDER_OPTIONS.error
 
   public status: ErrorObserveOptions = {

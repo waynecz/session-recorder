@@ -32,6 +32,19 @@ export interface RecorderWrappedXMLHttpRequest extends XMLHttpRequest {
   __skip_record__?: boolean
 }
 
+export interface Recorder {
+  docBufferer: DocumentBufferer
+  trail: any[]
+  observers: { [key: string]: any }
+  MAX_TIME: number
+  baseTime: number
+  options: RecorderOptions
+  recording: boolean
+  start: () => void 
+  stop: () => void 
+  pushToTrail: (record: any) => void 
+}
+
 export interface RecorderOptions {
   console?: ConsoleObserveOptions
   event?: EventObserveOptions
@@ -40,4 +53,8 @@ export interface RecorderOptions {
   error?: ErrorObserveOptions
   history?: boolean
   mutation?: boolean
+}
+
+export interface DocumentBufferer {
+  domSnapshot: string
 }

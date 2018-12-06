@@ -1,10 +1,10 @@
-import { ObserverExtensionClass } from '../models/observers'
+import { HighOrderObserver } from '../models/observers'
 import { _original, _log, _parseURL, _replace } from '../tools/helpers'
 import { HistoryRecord, HistoryTypes } from '../models/observers/history'
-import Observer from './'
+import BasicObserverClass from './'
 
-export default class HistoryObserver extends Observer implements ObserverExtensionClass {
-  public name: string = 'HistoryObserver'
+export default class HistoryObserverClass extends BasicObserverClass implements HighOrderObserver {
+  public name: string = 'HistoryObserverClass'
   public status: boolean = false
   private lastHref: string
 

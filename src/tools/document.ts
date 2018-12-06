@@ -1,19 +1,19 @@
 import { ID_KEY } from '../constants'
-import { ElementX } from '../models'
+import { ElementX, DocumentBufferer } from '../models'
 
 /**
  * 1.Store initial document string with mark
  * 2.Create Map<node, id> for every node in DOM
  * 3.Add / Remove recorderId
  **/
-class DocumentBuffer {
+class DocumentBuffererClass implements DocumentBufferer {
   public map: Map<
     HTMLElement | Element | Node | EventTarget,
     number
   > = new Map()
   public domSnapshot: string
   public inited: boolean = false
-  private id: number = 0
+  private id: number = 0 // self-increase id
 
   constructor() {}
 
@@ -25,8 +25,6 @@ class DocumentBuffer {
     Array.from(document.all).forEach(this.buffer)
 
     this.domSnapshot = document.documentElement.outerHTML
-
-    window.localStorage.setItem('domSnapshot', JSON.stringify(this.domSnapshot))
 
     // remove id from node
     Array.from(document.all).forEach((node: HTMLElement) => {
@@ -87,6 +85,6 @@ class DocumentBuffer {
   }
 }
 
-const RecorderDocument = new DocumentBuffer()
+const documentBufferer = new DocumentBuffererClass()
 
-export default RecorderDocument
+export default documentBufferer

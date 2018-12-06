@@ -1,4 +1,4 @@
-import { ObserverExtensionClass } from '../models/observers'
+import { HighOrderObserver } from '../models/observers'
 import {
   ConsoleObserveOptions,
   ConsoleTypes,
@@ -6,11 +6,11 @@ import {
   ConsoleLevels
 } from '../models/observers/console'
 import { _replace, _original, _log } from '../tools/helpers'
-import Observer from './';
+import BasicObserverClass from './';
 import { RECORDER_OPTIONS } from '../constants';
 
-export default class ConsoleObserver extends Observer implements ObserverExtensionClass {
-  public name: string = 'ConsoleObserver'
+export default class ConsoleObserverClass extends BasicObserverClass implements HighOrderObserver {
+  public name: string = 'ConsoleObserverClass'
   private consoleLevels: string[] = Object.keys(ConsoleLevels)
   public options: ConsoleObserveOptions = {
     info: true,

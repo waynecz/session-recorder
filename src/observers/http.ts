@@ -1,4 +1,4 @@
-import { ObserverExtensionClass } from '../models/observers'
+import { HighOrderObserver } from '../models/observers'
 import {
   HttpObserveOptions,
   HttpRockets,
@@ -9,12 +9,12 @@ import {
 import { _replace, _original, _newuuid, _log } from '../tools/helpers'
 import { RecorderWrappedXMLHttpRequest } from '../models'
 import { isFunction } from '../tools/is'
-import Observer from './'
+import BasicObserverClass from './'
 import { RECORDER_OPTIONS } from '../constants';
 
-export default class HttpObserver extends Observer
-  implements ObserverExtensionClass {
-  public name: string = 'HttpObserver'
+export default class HttpObserverClass extends BasicObserverClass
+  implements HighOrderObserver {
+  public name: string = 'HttpObserverClass'
   public active: boolean
   public onobserved
   public options: HttpObserveOptions = RECORDER_OPTIONS.http

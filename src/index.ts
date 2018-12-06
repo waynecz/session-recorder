@@ -1,18 +1,18 @@
-import { ObserverExtensionClass, ObserverClass } from './models/observers'
-import { RecorderOptions } from './models'
+import { HighOrderObserver, BasicObserver } from './models/observers'
+import { RecorderOptions, Recorder } from './models'
 
-import ConsoleObserver from './observers/console'
-import EventObserver from './observers/event'
-import HttpObserver from './observers/http'
-import DOMMutationObserver from './observers/mutation'
-import JSErrorObserver from './observers/js-error'
-import HistoryObserver from './observers/history'
-import MouseObserver from './observers/mouse'
-import RecorderDocument from './tools/document'
+import ConsoleObserverClass from './observers/console'
+import EventObserverClass from './observers/event'
+import HttpObserverClass from './observers/http'
+import DOMMutationObserverClass from './observers/mutation'
+import JSErrorObserverClass from './observers/js-error'
+import HistoryObserverClass from './observers/history'
+import MouseObserverClass from './observers/mouse'
+import documentBufferer from './tools/document'
 import { _log, _warn, _now } from './tools/helpers'
 import { RECORDER_OPTIONS } from './constants';
 
-export default class Recorder {
+export default class RecorderClass implements Recorder {
   public trail: any[] = []
   public observers: { [key: string]: any } = {
     mutation: null,
@@ -22,9 +22,9 @@ export default class Recorder {
     error: null,
     history: null
   }
-
+  public docBufferer: any
   public MAX_TIME: number = 60000 // max record length(ms)
-  public baseTime: number = 0
+  public baseTime
   public options: RecorderOptions = RECORDER_OPTIONS
 
   public recording: boolean = false
@@ -33,6 +33,8 @@ export default class Recorder {
     if (options) {
       Object.assign(this.options, options)
     }
+
+    this.docBufferer = documentBufferer;
 
     const {
       mutation,
@@ -45,25 +47,26 @@ export default class Recorder {
     } = this.options
 
     Object.assign(this.observers, {
-      mutation: new DOMMutationObserver(mutation),
-      console: new ConsoleObserver(consoleOpt),
-      event: new EventObserver(event),
-      mouse: new MouseObserver(mouse),
-      http: new HttpObserver(http),
-      error: new JSErrorObserver(error),
-      history: new HistoryObserver(history)
+      mutation: new DOMMutationObserverClass(mutation),
+      console: new ConsoleObserverClass(consoleOpt),
+      event: new EventObserverClass(event),
+      mouse: new MouseObserverClass(mouse),
+      http: new HttpObserverClass(http),
+      error: new JSErrorObserverClass(error),
+      history: new HistoryObserverClass(history)
     })
 
+
     Object.entries(this.observers).forEach(
-      ([_, observer]: [string, ObserverClass]) => {
-        observer.$on('observed', this.push2Trail.bind(this))
+      ([_, observer]: [string, BasicObserver]) => {
+        observer.$on('observed', this.pushToTrail.bind(this))
       }
     )
 
-    RecorderDocument.init()
+    this.docBufferer.init()
   }
 
-  private push2Trail = record => {
+  public pushToTrail = (record): void => {
     if (!this.recording) return
     record = { t: _now() - this.baseTime, ...record }
     // limit the time of trail
@@ -73,7 +76,7 @@ export default class Recorder {
     this.trail.push(record)
   }
 
-  public start = () => {
+  public start = (): void => {
     if (this.recording) {
       _warn('record already started')
       return
@@ -82,7 +85,7 @@ export default class Recorder {
     this.recording = true
 
     Object.entries(this.observers).forEach(
-      ([_, observer]: [string, ObserverExtensionClass]) => {
+      ([_, observer]: [string, HighOrderObserver]) => {
         observer.install()
       }
     )
@@ -91,24 +94,20 @@ export default class Recorder {
     ;(window as any).__SESSION_RECORDER__ = this
   }
 
-  public end() {
+  public stop(): void {
     if (!this.recording) {
       _warn('record not started')
       return
     }
     // walk and uninstall observers
     Object.entries(this.observers).forEach(
-      ([_, observer]: [string, ObserverExtensionClass]) => {
+      ([_, observer]: [string, HighOrderObserver]) => {
         observer.uninstall()
       }
     )
 
     this.recording = false
   }
-
-  public saveTrail2LocalStorage(): void {
-    window.localStorage.setItem('trail', JSON.stringify(this.trail))
-  }
 }
 
-;(window as any).Recorder = Recorder
+;(window as any).Recorder = RecorderClass

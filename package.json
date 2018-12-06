@@ -1,6 +1,6 @@
 {
   "name": "@waynecz/session-recorder",
-  "version": "0.0.1-beta.3",
+  "version": "0.0.1-beta.5",
   "description": "Record DOM mustation / error / network / mouse / scroll / console and so on.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:waynecz/ui-recorder.git"
+    "url": "git@github.com:waynecz/session-recorder.git"
   },
   "keywords": [
     "feedback",

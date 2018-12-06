@@ -1,7 +1,7 @@
 import { isFunction } from "../tools/is";
-import { ObserverClass } from "../models/observers";
+import { BasicObserver } from "../models/observers";
 
-export default class Observer implements ObserverClass {
+export default class BasicObserverClass implements BasicObserver {
   public queues: Map<string, Function[]> = new Map();
 
   public $on = (hook: string, action: Function): void => {

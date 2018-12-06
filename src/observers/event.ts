@@ -1,10 +1,10 @@
-import { ObserverExtensionClass } from '../models/observers'
+import { HighOrderObserver } from '../models/observers'
 import { EventReocrd, EventTypes } from '../models/observers/event'
 import { EventObserveOptions, Listener } from '../models/observers/event'
 import { ElementX, FormELement } from '../models'
 import { _throttle, _log } from '../tools/helpers'
 import RecorderDocument from '../tools/document'
-import Observer from './'
+import BasicObserverClass from './'
 import { RECORDER_OPTIONS } from '../constants';
 
 const { getRecordIdByElement } = RecorderDocument
@@ -13,8 +13,8 @@ const { getRecordIdByElement } = RecorderDocument
  * Observe scroll, window resize, form change(input/textarea/radio etc.)
  * and produce an Record
  **/
-export default class EventObserver extends Observer implements ObserverExtensionClass {
-  public name: string = 'EventObserver'
+export default class EventObserverClass extends BasicObserverClass implements HighOrderObserver {
+  public name: string = 'EventObserverClass'
   public listeners: Listener[] = []
   public options: EventObserveOptions = {
     scroll: true,

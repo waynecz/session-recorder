@@ -1,4 +1,4 @@
-import { ObserverExtensionClass } from '../models/observers'
+import { HighOrderObserver } from '../models/observers'
 import {
   DOMMutationRecord,
   DOMMutationTypes,
@@ -8,7 +8,7 @@ import { MutationRecordX } from '../models'
 import { ID_KEY } from '../constants'
 import RecorderDocument from '../tools/document'
 import { _log } from '../tools/helpers'
-import Observer from './'
+import BasicObserverClass from './'
 
 const { getRecordIdByElement } = RecorderDocument
 
@@ -16,9 +16,9 @@ const { getRecordIdByElement } = RecorderDocument
  * Observe DOM change such as DOM-add/remove text-change attribute-change
  * and generate an Record
  **/
-export default class DOMMutationObserver extends Observer
-  implements ObserverExtensionClass {
-  public name: string = 'DOMMutationObserver'
+export default class DOMMutationObserverClass extends BasicObserverClass
+  implements HighOrderObserver {
+  public name: string = 'DOMMutationObserverClass'
   private observer: MutationObserver
   public status = {
     mutation: true
@@ -89,8 +89,8 @@ export default class DOMMutationObserver extends Observer
     // 这时我们将 record.target 指向 `元素A` ，
     // record.html 取 `元素A` 的 innerHTML。
     // --------------------------------------------------------------------------------------------------
-    // When the mutation happen with `elementA` which contains textNodes and element inside, like a contenteditable div element,
-    // it SHOULD been noted that MutationObserver will point the `target` to the textNode we modified,
+    // When the mutation happen with contenteditable `elementA` which contains textNodes and element inside,
+    // NOTE that MutationObserver will point the `target` to the textNode we modified,
     // therefore, we should get undefined of `getRecordIdByElement(target)` (since document bufferer didn't buffer textNode).
     // So we manually set record.target = `elementA`,
     // and record.html = elementA.innerHTML at the same time
@@ -256,10 +256,10 @@ export default class DOMMutationObserver extends Observer
   }
 
   public install() {
-    const Observer =
+    const mutationObserver =
       (window as any).MutationObserver || (window as any).WebKitMutationObserver
 
-    this.observer = new Observer((records: MutationRecord[]) => {
+    this.observer = new mutationObserver((records: MutationRecord[]) => {
       const { $emit } = this
 
       for (let record of records) {
