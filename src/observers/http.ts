@@ -9,23 +9,21 @@ import {
 import { _replace, _original, _newuuid, _log } from '../tools/helpers'
 import { RecorderWrappedXMLHttpRequest } from '../models'
 import { isFunction } from '../tools/is'
-import Observer from './';
+import Observer from './'
+import { RECORDER_OPTIONS } from '../constants';
 
-export default class HttpObserver extends Observer implements ObserverExtensionClass {
+export default class HttpObserver extends Observer
+  implements ObserverExtensionClass {
   public name: string = 'HttpObserver'
   public active: boolean
   public onobserved
-  public options: HttpObserveOptions = {
-    beacon: true,
-    fetch: true,
-    xhr: true
-    // TODO: websocket support
-  }
+  public options: HttpObserveOptions = RECORDER_OPTIONS.http
   public status: HttpObserveOptions = {
     beacon: false,
     fetch: false,
     xhr: false
   }
+
   public xhrMap: Map<string, HttpStartRecord> = new Map()
 
   constructor(options: HttpObserveOptions | boolean) {
@@ -132,7 +130,7 @@ export default class HttpObserver extends Observer implements ObserverExtensionC
                 id: requestId,
                 errmsg: message
               }
-              
+
               $emit('observed', errRecord)
 
               throw error
@@ -175,12 +173,12 @@ export default class HttpObserver extends Observer implements ObserverExtensionC
     function XHRSendReplacement(originalSend) {
       return function(this: RecorderWrappedXMLHttpRequest, body) {
         const thisXHR = this
-        const { __id__: requestId, __recorder_own__ } = thisXHR
+        const { __id__: requestId, __skip_record__ } = thisXHR
 
         let startRecord = self.xhrMap.get(requestId)
 
         // skip recorder's own request
-        if (startRecord && !__recorder_own__) {
+        if (startRecord && !__skip_record__) {
           startRecord.input = body
           // record before send
           self.onobserved(startRecord)
@@ -188,7 +186,7 @@ export default class HttpObserver extends Observer implements ObserverExtensionC
 
         function onreadystatechangeHandler(): void {
           if (this.readyState === 4) {
-            if (this.__recorder_own__) return
+            if (this.__skip_record__) return
 
             const endRecord: HttpEndRecord = {
               type: HttpEndTypes.xhrend,

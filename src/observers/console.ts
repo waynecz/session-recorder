@@ -7,6 +7,7 @@ import {
 } from '../models/observers/console'
 import { _replace, _original, _log } from '../tools/helpers'
 import Observer from './';
+import { RECORDER_OPTIONS } from '../constants';
 
 export default class ConsoleObserver extends Observer implements ObserverExtensionClass {
   public name: string = 'ConsoleObserver'
@@ -18,13 +19,7 @@ export default class ConsoleObserver extends Observer implements ObserverExtensi
     warn: true,
     debug: false
   }
-  public status: ConsoleObserveOptions = {
-    info: false,
-    error: false,
-    log: false,
-    warn: false,
-    debug: false
-  }
+  public status = RECORDER_OPTIONS.console
 
   constructor(options: ConsoleObserveOptions | boolean) {
     super()

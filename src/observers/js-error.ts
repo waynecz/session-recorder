@@ -6,14 +6,13 @@ import {
 } from '../models/observers/error'
 import { _replace, _log, _original } from '../tools/helpers'
 import Observer from './';
+import { RECORDER_OPTIONS } from '../constants';
 
 // TODO: error stack trace compution
 export default class JSErrorObserver extends Observer implements ObserverExtensionClass {
   public name: string = 'JSErrorObserver'
-  public options: ErrorObserveOptions = {
-    jserror: true,
-    unhandledrejection: true
-  }
+  public options: ErrorObserveOptions = RECORDER_OPTIONS.error
+
   public status: ErrorObserveOptions = {
     jserror: false,
     unhandledrejection: false

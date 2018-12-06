@@ -1,6 +1,6 @@
 {
   "name": "@waynecz/session-recorder",
-  "version": "0.0.1-beta.2",
+  "version": "0.0.1-beta.3",
   "description": "Record DOM mustation / error / network / mouse / scroll / console and so on.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -19,6 +19,9 @@
     "heatmap",
     "analysis",
     "uirecord"
+  ],
+  "files": [
+    "dist"
   ],
   "author": "waynecz <451578533@qq.com>",
   "license": "MIT",

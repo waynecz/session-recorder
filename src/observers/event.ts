@@ -5,6 +5,7 @@ import { ElementX, FormELement } from '../models'
 import { _throttle, _log } from '../tools/helpers'
 import RecorderDocument from '../tools/document'
 import Observer from './'
+import { RECORDER_OPTIONS } from '../constants';
 
 const { getRecordIdByElement } = RecorderDocument
 
@@ -20,11 +21,7 @@ export default class EventObserver extends Observer implements ObserverExtension
     resize: true,
     form: true
   }
-  public status: EventObserveOptions = {
-    scroll: false,
-    resize: false,
-    form: false
-  }
+  public status: EventObserveOptions = RECORDER_OPTIONS.event
 
   constructor(options: EventObserveOptions | boolean) {
     super()
@@ -91,7 +88,6 @@ export default class EventObserver extends Observer implements ObserverExtension
   }
 
   private getResizeRecord = (): void => {
-    debugger
     const { clientWidth: w, clientHeight: h } = document.documentElement
     const record: EventReocrd = { type: EventTypes.resize, w, h }
     const { $emit } = this

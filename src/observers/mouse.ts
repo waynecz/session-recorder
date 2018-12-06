@@ -2,19 +2,19 @@ import { ObserverExtensionClass } from '../models/observers'
 import { MouseReocrd, MouseTypes } from '../models/observers/event'
 import { MouseObserverOptions, Listener } from '../models/observers/event'
 import { _throttle, _log } from '../tools/helpers'
-import Observer from './';
+import Observer from './'
+import { RECORDER_OPTIONS } from '../constants'
 
 /**
  * Observe mouse behavior
  * and produce an Record
  **/
-export default class MouseObserver extends Observer implements ObserverExtensionClass {
+export default class MouseObserver extends Observer
+  implements ObserverExtensionClass {
   public name: string = 'MouseObserver'
   public listeners: Listener[] = []
-  public options: MouseObserverOptions = {
-    click: true,
-    mousemove: true
-  }
+  public options: MouseObserverOptions = RECORDER_OPTIONS.mouse
+
   public status: MouseObserverOptions = {
     click: false,
     mousemove: false

@@ -1,8 +1,5 @@
 import { ConsoleObserveOptions } from './observers/console'
-import {
-  EventObserveOptions,
-  MouseObserverOptions
-} from './observers/event'
+import { EventObserveOptions, MouseObserverOptions } from './observers/event'
 import { HttpObserveOptions } from './observers/http'
 import { ErrorObserveOptions } from './observers/error'
 
@@ -29,11 +26,10 @@ export interface MutationWindow extends Window {
 
 export declare const window: MutationWindow
 
-
 export interface RecorderWrappedXMLHttpRequest extends XMLHttpRequest {
   [key: string]: any
   __id__?: string
-  __recorder_own__?: boolean
+  __skip_record__?: boolean
 }
 
 export interface RecorderOptions {
