@@ -2,6 +2,7 @@ import { ConsoleObserveOptions } from './observers/console'
 import { EventObserveOptions, MouseObserverOptions } from './observers/event'
 import { HttpObserveOptions } from './observers/http'
 import { ErrorObserveOptions } from './observers/error'
+import { BasicObserver } from './observers';
 
 export type ElementX = HTMLElement | Element
 
@@ -32,20 +33,32 @@ export interface RecorderWrappedXMLHttpRequest extends XMLHttpRequest {
   __skip_record__?: boolean
 }
 
+export type ObserverName =
+  | 'mutation'
+  | 'console'
+  | 'event'
+  | 'mouse'
+  | 'error'
+  | 'history'
+
+export type Observers = { [key in ObserverName]: BasicObserver }
+
 export interface Recorder {
-  docBufferer: DocumentBufferer
+  domTreeBufferer: DomTreeBufferer
   trail: any[]
-  observers: { [key: string]: any }
+  observers: Observers
   MAX_TIME: number
   baseTime: number
   options: RecorderOptions
   recording: boolean
-  start: () => void 
-  stop: () => void 
-  pushToTrail: (record: any) => void 
+
+  start: () => void
+  stop: () => void
+  clearTrail: () => void
+  pushToTrail: (record: any) => void
 }
 
-export interface RecorderOptions {
+export type RecorderOptions = {
   console?: ConsoleObserveOptions
   event?: EventObserveOptions
   mouse?: MouseObserverOptions
@@ -55,6 +68,7 @@ export interface RecorderOptions {
   mutation?: boolean
 }
 
-export interface DocumentBufferer {
+export interface DomTreeBufferer {
   domSnapshot: string
+  init(): void
 }

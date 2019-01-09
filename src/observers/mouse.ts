@@ -82,7 +82,7 @@ export default class MouseObserverClass extends BasicObserverClass
       this.status.mousemove = true
     }
 
-    _log('mouse installed!')
+    _log('mouse observer ready!')
   }
 
   public uninstall() {

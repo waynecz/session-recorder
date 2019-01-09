@@ -4,7 +4,7 @@ import {
   ErrorRecord,
   ErrorTypes
 } from '../models/observers/error'
-import { _replace, _log, _original } from '../tools/helpers'
+import { _replace, _log, _recover } from '../tools/helpers'
 import BasicObserverClass from './';
 import { RECORDER_OPTIONS } from '../constants';
 
@@ -60,8 +60,8 @@ export default class JSErrorObserverClass extends BasicObserverClass implements 
           } as ErrorEvent)
         }
 
-        // TODO: find approximate "this" scope for oldOnerrorHandler - not window
         if (oldOnerrorHandler) {
+          // TODO: find approximate "this" scope for oldOnerrorHandler - not window
           oldOnerrorHandler.apply(window, arguments)
         }
       }
@@ -115,10 +115,9 @@ export default class JSErrorObserverClass extends BasicObserverClass implements 
       _errevt.reason = 'undefined'
     }
 
-    const { reason: msg } = _errevt
     const record: ErrorRecord = {
       type: ErrorTypes.unhandledrejection,
-      msg
+      msg: _errevt.reason
     }
 
     const { $emit } = this
@@ -132,7 +131,7 @@ export default class JSErrorObserverClass extends BasicObserverClass implements 
       this.installGlobalerrorHandler()
       this.status.jserror = true
 
-      // TODO: protect recorder's onerror's hook by defineProperty
+      // TODO: protect recorder's onerror hook by defineProperty
       Object.defineProperty(window, 'onerror', {
         set(newHook) {
           if (!newHook.__recorder__) {
@@ -147,19 +146,19 @@ export default class JSErrorObserverClass extends BasicObserverClass implements 
       this.status.unhandledrejection = true
     }
 
-    _log('error installed!')
+    _log('error observer ready!')
   }
 
   public uninstall(): void {
     const { jserror, unhandledrejection } = this.options
 
     if (jserror) {
-      _original(window, 'onerror')
+      _recover(window, 'onerror')
       this.status.jserror = false
     }
 
     if (unhandledrejection) {
-      _original(window, 'onunhandledrejection')
+      _recover(window, 'onunhandledrejection')
       this.status.unhandledrejection = false
     }
   }

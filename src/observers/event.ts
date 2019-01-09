@@ -3,24 +3,20 @@ import { EventReocrd, EventTypes } from '../models/observers/event'
 import { EventObserveOptions, Listener } from '../models/observers/event'
 import { ElementX, FormELement } from '../models'
 import { _throttle, _log } from '../tools/helpers'
-import RecorderDocument from '../tools/document'
+import RecorderDocument from '../tools/dom-bufferer'
 import BasicObserverClass from './'
 import { RECORDER_OPTIONS } from '../constants';
 
 const { getRecordIdByElement } = RecorderDocument
 
 /**
- * Observe scroll, window resize, form change(input/textarea/radio etc.)
+ * Observe scroll, window resize, form field value change(input/textarea/radio etc.)
  * and produce an Record
  **/
 export default class EventObserverClass extends BasicObserverClass implements HighOrderObserver {
   public name: string = 'EventObserverClass'
   public listeners: Listener[] = []
-  public options: EventObserveOptions = {
-    scroll: true,
-    resize: true,
-    form: true
-  }
+  public options: EventObserveOptions = RECORDER_OPTIONS.event
   public status: EventObserveOptions = RECORDER_OPTIONS.event
 
   constructor(options: EventObserveOptions | boolean) {
@@ -49,7 +45,7 @@ export default class EventObserverClass extends BasicObserverClass implements Hi
     cb && cb()
   }
 
-  /** Provide that Document's direction is `rtl`(default) */
+  // Provide that document's direction is `rtl`(default) 
   private getScrollPosition = (): { x: number; y: number } => {
     // Quirks mode on the contrary
     const isStandardsMode = document.compatMode === 'CSS1Compat'
@@ -70,7 +66,8 @@ export default class EventObserverClass extends BasicObserverClass implements Hi
 
     let record = { type: EventTypes.scroll } as EventReocrd
 
-    // If 1. target is docuemnt / 2. Non-event invoking
+    // 1. target is docuemnt 
+    // 2. No event invoking
     if (target === document || !target) {
       let { x, y } = this.getScrollPosition()
       record = { ...record, x, y }
@@ -139,7 +136,7 @@ export default class EventObserverClass extends BasicObserverClass implements Hi
         options: true
       })
       this.status.scroll = true
-      /** Non-event invoking in order to get initial document's scroll position */
+      // in order to get initial document's scroll position
       this.getScrollRecord()
     }
 
@@ -164,7 +161,7 @@ export default class EventObserverClass extends BasicObserverClass implements Hi
       this.status.form = true
     }
 
-    _log('events installed!')
+    _log('events observer ready!')
   }
 
   public uninstall() {

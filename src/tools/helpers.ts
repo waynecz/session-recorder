@@ -74,7 +74,7 @@ export function _replace(
 /**
  * Reverse to original function
  */
-export function _original(source: object, name: string): void {
+export function _recover(source: object, name: string): void {
   if (!(name in source) || !source[name].__recorder__) return
 
   const { __recorder_original__ } = source[name]
@@ -112,5 +112,7 @@ export function _parseURL(
 }
 
 export function _seralize(obj: { [key: string]: any }): string {
-  return Object.entries(obj).map(([k, v]) => `${k}=${v}`).join('&')
+  return Object.keys(obj)
+    .map(k => `${k}=${obj[k]}`)
+    .join('&')
 }

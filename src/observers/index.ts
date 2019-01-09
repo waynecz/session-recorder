@@ -6,9 +6,9 @@ export default class BasicObserverClass implements BasicObserver {
 
   public $on = (hook: string, action: Function): void => {
     const { queues } = this;
-    const existingQ = queues.get(hook) || [];
+    const existingTasks = queues.get(hook) || [];
 
-    queues.set(hook, [...existingQ, action]);
+    queues.set(hook, [...existingTasks, action]);
   }
 
   public $off = (hook: string, thisAction: Function): void => {

@@ -6,7 +6,7 @@ import {
   HttpEndRecord,
   HttpEndTypes
 } from '../models/observers/http'
-import { _replace, _original, _newuuid, _log } from '../tools/helpers'
+import { _replace, _recover, _newuuid, _log } from '../tools/helpers'
 import { RecorderWrappedXMLHttpRequest } from '../models'
 import { isFunction } from '../tools/is'
 import BasicObserverClass from './'
@@ -16,7 +16,6 @@ export default class HttpObserverClass extends BasicObserverClass
   implements HighOrderObserver {
   public name: string = 'HttpObserverClass'
   public active: boolean
-  public onobserved
   public options: HttpObserveOptions = RECORDER_OPTIONS.http
   public status: HttpObserveOptions = {
     beacon: false,
@@ -181,7 +180,7 @@ export default class HttpObserverClass extends BasicObserverClass
         if (startRecord && !__skip_record__) {
           startRecord.input = body
           // record before send
-          self.onobserved(startRecord)
+          $emit('observed', startRecord)
         }
 
         function onreadystatechangeHandler(): void {
@@ -255,19 +254,19 @@ export default class HttpObserverClass extends BasicObserverClass
       this.status.xhr = true
     }
 
-    _log('http installed!')
+    _log('http observer ready!')
   }
 
   public uninstall(): void {
     const { beacon, fetch, xhr } = this.options
 
     if (beacon) {
-      _original(window.navigator, 'sendBeacon')
+      _recover(window.navigator, 'sendBeacon')
       this.status.beacon = false
     }
 
     if (fetch) {
-      _original(window, 'fetch')
+      _recover(window, 'fetch')
       this.status.fetch = false
     }
 

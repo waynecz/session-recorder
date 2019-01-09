@@ -1,12 +1,12 @@
 import { ID_KEY } from '../constants'
-import { ElementX, DocumentBufferer } from '../models'
+import { ElementX, DomTreeBufferer } from '../models'
 
 /**
  * 1.Store initial document string with mark
  * 2.Create Map<node, id> for every node in DOM
  * 3.Add / Remove recorderId
  **/
-class DocumentBuffererClass implements DocumentBufferer {
+class DomTreeBuffererClass implements DomTreeBufferer {
   public map: Map<
     HTMLElement | Element | Node | EventTarget,
     number
@@ -85,6 +85,6 @@ class DocumentBuffererClass implements DocumentBufferer {
   }
 }
 
-const documentBufferer = new DocumentBuffererClass()
+const documentBufferer = new DomTreeBuffererClass()
 
 export default documentBufferer

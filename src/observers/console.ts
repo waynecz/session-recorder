@@ -5,7 +5,7 @@ import {
   ConsoleRecord,
   ConsoleLevels
 } from '../models/observers/console'
-import { _replace, _original, _log } from '../tools/helpers'
+import { _replace, _recover, _log } from '../tools/helpers'
 import BasicObserverClass from './';
 import { RECORDER_OPTIONS } from '../constants';
 
@@ -32,11 +32,11 @@ export default class ConsoleObserverClass extends BasicObserverClass implements 
     const { status, $emit } = this
 
     this.consoleLevels.forEach(
-      (level: string): void => {
+      (level: keyof ConsoleObserveOptions): void => {
         if (!this.options[level]) return
 
-        function consoleReplacement(originalConsoleFunc) {
-          return function(...args) {
+        function consoleReplacement(originalConsoleFunc: Function) {
+          return function(...args: any[]) {
             if (!args.length) return
 
             const record: ConsoleRecord = {
@@ -58,15 +58,15 @@ export default class ConsoleObserverClass extends BasicObserverClass implements 
         status[level] = true
       }
     )
-    _log('console installed!')
+    _log('console observer ready!')
   }
 
   public uninstall(): void {
     this.consoleLevels.forEach(
-      (level: string): void => {
+      (level: keyof ConsoleObserveOptions): void => {
         if (!this.options[level]) return
 
-        _original(console, level)
+        _recover(console, level)
 
         status[level] = false
       }

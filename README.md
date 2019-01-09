@@ -2,18 +2,16 @@
 
 > Note this repo is still processing. DO NOT USE IN PRODUCTION!
 
-See also [Session-Player(developing)](https://github.com/waynecz/session-player) for consume Recorder's data
+See also [Session-Player(developing)](https://github.com/waynecz/session-player) for consuming Recorder's data
 
 ### Record list:
-
-+ [x] DOM mutation
-+ [x] Network
-+ [x] Error
-+ [x] Mouse click / move,  Scroll
-+ [x] Console
++ DOM mutation
++ Network(xhr, fetch, beacon)
++ Global Error, Unhandled rejection
++ Mouse, Scroll
++ Console
 
 ### Output like:
-
 ```json
 {
   "ui": [
@@ -21,13 +19,14 @@ See also [Session-Player(developing)](https://github.com/waynecz/session-player)
     { "t": 2, "type": "form", "target": 16, "k": "value", "v": "2312" },
     { "t": 3, "type": "attr", "target": 14, "attr": { "k": "class", "v": "a" } },
     { "t": 4, "type": "scroll", "x": 0, "y": 10 },
+    { "t": 4.5, "type": "click", "x": 71, "y": 13 },
     { "t": 5, "type": "form", "target": 19, "k": "checked", "v": true },
     { "t": 6, "type": "jserr", "msg": "Type Error: ...", "url": "...", "err": "..." },
     { "t": 7, "type": "xhr", "url": "...", "method": "GET", "id": "21asdcxz" },
     { "t": 8, "type": "xhrend", "status": 503, "id": "21asdcxz" },
+    { "t": 8.5, "type": "move", "x": 38, "y": 510 },
     { "t": 9, "type": "console", "l": "warn", "msg": "..." }
-  ],
-  "mouse": [{ "t": 1, "type": "move", "x": 38, "y": 510 }, { "t": 2, "type": "click", "x": 71, "y": 13 }]
+  ]
 }
 
 ```

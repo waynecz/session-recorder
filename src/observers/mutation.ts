@@ -6,7 +6,7 @@ import {
 } from '../models/observers/mutation'
 import { MutationRecordX } from '../models'
 import { ID_KEY } from '../constants'
-import RecorderDocument from '../tools/document'
+import RecorderDocument from '../tools/dom-bufferer'
 import { _log } from '../tools/helpers'
 import BasicObserverClass from './'
 
@@ -278,7 +278,7 @@ export default class DOMMutationObserverClass extends BasicObserverClass
       subtree: true
     })
 
-    _log('mutation installed')
+    _log('mutation observer ready!')
 
     this.status.mutation = true
   }

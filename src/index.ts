@@ -1,5 +1,5 @@
-import { HighOrderObserver, BasicObserver } from './models/observers'
-import { RecorderOptions, Recorder } from './models'
+import { HighOrderObserver } from './models/observers'
+import { RecorderOptions, Recorder, DomTreeBufferer, Observers, ObserverName } from './models'
 
 import ConsoleObserverClass from './observers/console'
 import EventObserverClass from './observers/event'
@@ -8,13 +8,13 @@ import DOMMutationObserverClass from './observers/mutation'
 import JSErrorObserverClass from './observers/js-error'
 import HistoryObserverClass from './observers/history'
 import MouseObserverClass from './observers/mouse'
-import documentBufferer from './tools/document'
+import domTreeBufferer from './tools/dom-bufferer'
 import { _log, _warn, _now } from './tools/helpers'
-import { RECORDER_OPTIONS } from './constants';
+import { RECORDER_OPTIONS } from './constants'
 
 export default class RecorderClass implements Recorder {
   public trail: any[] = []
-  public observers: { [key: string]: any } = {
+  public observers: Observers = {
     mutation: null,
     console: null,
     event: null,
@@ -22,10 +22,10 @@ export default class RecorderClass implements Recorder {
     error: null,
     history: null
   }
-  public docBufferer: any
+  public domTreeBufferer: DomTreeBufferer
   public MAX_TIME: number = 60000 // max record length(ms)
-  public baseTime
   public options: RecorderOptions = RECORDER_OPTIONS
+  public baseTime: number = 0
 
   public recording: boolean = false
 
@@ -34,7 +34,7 @@ export default class RecorderClass implements Recorder {
       Object.assign(this.options, options)
     }
 
-    this.docBufferer = documentBufferer;
+    this.domTreeBufferer = domTreeBufferer
 
     const {
       mutation,
@@ -56,14 +56,13 @@ export default class RecorderClass implements Recorder {
       history: new HistoryObserverClass(history)
     })
 
+    Object.keys(this.observers).forEach((observerName: ObserverName) => {
+      const observer = this.observers[observerName]
 
-    Object.entries(this.observers).forEach(
-      ([_, observer]: [string, BasicObserver]) => {
-        observer.$on('observed', this.pushToTrail.bind(this))
-      }
-    )
+      observer.$on('observed', this.pushToTrail.bind(this))
+    })
 
-    this.docBufferer.init()
+    this.domTreeBufferer.init()
   }
 
   public pushToTrail = (record): void => {
@@ -76,6 +75,10 @@ export default class RecorderClass implements Recorder {
     this.trail.push(record)
   }
 
+  public clearTrail = (): void => {
+    this.trail = []
+  }
+
   public start = (): void => {
     if (this.recording) {
       _warn('record already started')
@@ -84,29 +87,28 @@ export default class RecorderClass implements Recorder {
 
     this.recording = true
 
-    Object.entries(this.observers).forEach(
-      ([_, observer]: [string, HighOrderObserver]) => {
-        observer.install()
-      }
-    )
+    Object.keys(this.observers).forEach(observerName => {
+      (this.observers[observerName] as HighOrderObserver).install()
+    })
 
     this.baseTime = _now()
     ;(window as any).__SESSION_RECORDER__ = this
   }
 
-  public stop(): void {
+  public stop = (): void => {
     if (!this.recording) {
       _warn('record not started')
       return
     }
-    // walk and uninstall observers
-    Object.entries(this.observers).forEach(
-      ([_, observer]: [string, HighOrderObserver]) => {
-        observer.uninstall()
-      }
-    )
 
     this.recording = false
+  }
+
+  public uninstallObservers = (): void => {
+    // walk and uninstall observers
+    Object.keys(this.observers).forEach(observerName => {
+      (this.observers[observerName] as HighOrderObserver).uninstall()
+    })
   }
 }
 

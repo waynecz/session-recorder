@@ -1,7 +1,7 @@
 {
   "name": "@waynecz/session-recorder",
-  "version": "0.0.1-beta.5",
-  "description": "Record DOM mustation / error / network / mouse / scroll / console and so on.",
+  "version": "0.0.2-alpha.3",
+  "description": "Record user interactions/js error/network/console in web",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
@@ -44,5 +44,8 @@
     "webpack-cli": "^3.1.0",
     "webpack-dev-server": "^3.1.9",
     "webpack-merge": "^4.1.4"
+  },
+  "dependencies": {
+    "dts-bundle": "^0.7.3"
   }
 }

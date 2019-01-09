@@ -1,5 +1,5 @@
 import { HighOrderObserver } from '../models/observers'
-import { _original, _log, _parseURL, _replace } from '../tools/helpers'
+import { _recover, _log, _parseURL, _replace } from '../tools/helpers'
 import { HistoryRecord, HistoryTypes } from '../models/observers/history'
 import BasicObserverClass from './'
 
@@ -77,9 +77,9 @@ export default class HistoryObserverClass extends BasicObserverClass implements 
   }
 
   public uninstall(): void {
-    _original(window, 'onpopstate')
-    _original(window.history, 'pushState')
-    _original(window.history, 'replaceState')
+    _recover(window, 'onpopstate')
+    _recover(window.history, 'pushState')
+    _recover(window.history, 'replaceState')
     this.status = false
   }
 }
