@@ -21,11 +21,11 @@ export interface FormELement extends HTMLElement {
 }
 
 export interface MutationWindow extends Window {
-  MutationObserver: any
-  WebKitMutationObserver: any
+  MutationObserver?: any
+  WebKitMutationObserver?: any
 }
 
-export declare const window: MutationWindow
+export const myWindow: MutationWindow = window
 
 export interface RecorderWrappedXMLHttpRequest extends XMLHttpRequest {
   [key: string]: any
@@ -70,5 +70,7 @@ export type RecorderOptions = {
 
 export interface DomTreeBufferer {
   domSnapshot: string
-  init(): void
+  inited: boolean
+
+  takeSnapshotForPageDocument(): void
 }

@@ -136,7 +136,7 @@ export default class EventObserverClass extends BasicObserverClass implements Hi
         options: true
       })
       this.status.scroll = true
-      // in order to get initial document's scroll position
+      // get initial page's scroll position
       this.getScrollRecord()
     }
 
@@ -147,7 +147,7 @@ export default class EventObserverClass extends BasicObserverClass implements Hi
         callback: _throttle(this.getResizeRecord)
       })
       this.status.resize = true
-      /** Get viewport size primitively */
+      /** Get viewport size at the begining */
       this.getResizeRecord()
     }
 

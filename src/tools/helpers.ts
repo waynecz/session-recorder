@@ -65,7 +65,7 @@ export function _replace(
     return
   } else if (original === null || original === undefined) {
     // such as window.onerror whose initial value would be null
-    // in this case, do replace directly
+    // so just do the replacement
     doReplace()
     return
   }
@@ -73,6 +73,8 @@ export function _replace(
 
 /**
  * Reverse to original function
+ * @param source The object that contains a method been wrapped.
+ * @param name The name of method been wrapped.
  */
 export function _recover(source: object, name: string): void {
   if (!(name in source) || !source[name].__recorder__) return
@@ -82,6 +84,10 @@ export function _recover(source: object, name: string): void {
   source[name] = __recorder_original__
 }
 
+/**
+ * 
+ * @param href 
+ */
 export function _parseURL(
   href: string = location.href
 ): {

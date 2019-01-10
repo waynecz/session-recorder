@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "module": "es6",
+    "module": "es2015",
     "target": "es6",
     "moduleResolution": "node",
     "declaration": true,
     "pretty": true,
-    "declarationDir": "dist",
     "noImplicitAny": false,
     "noLib": false,
     "allowSyntheticDefaultImports": true,

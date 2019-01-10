@@ -1,9 +1,9 @@
 {
   "name": "@waynecz/session-recorder",
-  "version": "0.0.2-alpha.3",
+  "version": "0.0.2-alpha.6",
   "description": "Record user interactions/js error/network/console in web",
   "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "typings": "./dist/index.d.ts",
   "scripts": {
     "lint": "tslint './src/**/*.ts*' --format --force",
     "dev": "npx webpack-dev-server --inline --config build/dev.js",

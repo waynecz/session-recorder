@@ -1,5 +1,11 @@
 import { HighOrderObserver } from './models/observers'
-import { RecorderOptions, Recorder, DomTreeBufferer, Observers, ObserverName } from './models'
+import {
+  RecorderOptions,
+  Recorder,
+  DomTreeBufferer,
+  Observers,
+  ObserverName
+} from './models'
 
 import ConsoleObserverClass from './observers/console'
 import EventObserverClass from './observers/event'
@@ -61,8 +67,6 @@ export default class RecorderClass implements Recorder {
 
       observer.$on('observed', this.pushToTrail.bind(this))
     })
-
-    this.domTreeBufferer.init()
   }
 
   public pushToTrail = (record): void => {
@@ -76,6 +80,7 @@ export default class RecorderClass implements Recorder {
   }
 
   public clearTrail = (): void => {
+    this.stop()
     this.trail = []
   }
 
@@ -84,14 +89,17 @@ export default class RecorderClass implements Recorder {
       _warn('record already started')
       return
     }
-
+    
     this.recording = true
 
+    this.domTreeBufferer.takeSnapshotForPageDocument()
+
     Object.keys(this.observers).forEach(observerName => {
-      (this.observers[observerName] as HighOrderObserver).install()
+      ;(this.observers[observerName] as HighOrderObserver).install()
     })
 
     this.baseTime = _now()
+
     ;(window as any).__SESSION_RECORDER__ = this
   }
 
@@ -107,7 +115,7 @@ export default class RecorderClass implements Recorder {
   public uninstallObservers = (): void => {
     // walk and uninstall observers
     Object.keys(this.observers).forEach(observerName => {
-      (this.observers[observerName] as HighOrderObserver).uninstall()
+      ;(this.observers[observerName] as HighOrderObserver).uninstall()
     })
   }
 }

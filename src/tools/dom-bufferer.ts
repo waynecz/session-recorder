@@ -17,25 +17,31 @@ class DomTreeBuffererClass implements DomTreeBufferer {
 
   constructor() {}
 
-  public init() {
-    console.time('[Document buffer]')
+  public takeSnapshotForPageDocument() {
+    const action = () => {
+      console.time('[Document snapshot]')
 
-    // Buffer every element into the Map
-    // Note that textNodes wouldn't been included !!
-    Array.from(document.all).forEach(this.buffer)
+      // Buffer every element into the Map
+      // Note that textNodes wouldn't been included !!
+      Array.prototype.slice.call(document.all).forEach(this.buffer)
 
-    this.domSnapshot = document.documentElement.outerHTML
+      this.domSnapshot = document.documentElement.outerHTML
 
-    // remove id from node
-    Array.from(document.all).forEach((node: HTMLElement) => {
-      this.unmark(node)
-    })
+      // remove id from node
+      Array.prototype.slice.call(document.all).forEach((node: HTMLElement) => {
+        this.unmark(node)
+      })
 
-    this.inited = true
+      this.inited = true
 
-    console.timeEnd('[Document buffer]')
+      console.timeEnd('[Document snapshot]')
+    }
 
-    return this
+    if (['complete', 'interactive'].indexOf(document.readyState) !== -1) {
+      action()
+    } else {
+      document.addEventListener('DOMContentLoaded', action)
+    }
   }
 
   private newId(): number {
@@ -54,7 +60,9 @@ class DomTreeBuffererClass implements DomTreeBufferer {
     removeAttribute && ele.removeAttribute(ID_KEY)
 
     if (isDeep && ele.childElementCount) {
-      Array.from(ele.children).forEach(chEle => this.unmark(chEle))
+      Array.prototype.slice
+        .call(ele.children)
+        .forEach(chEle => this.unmark(chEle))
     }
   }
 
@@ -73,7 +81,9 @@ class DomTreeBuffererClass implements DomTreeBufferer {
 
     if (ele.childElementCount) {
       // element.children retun childElements without textNodes
-      Array.from(ele.children).forEach(chEle => this.bufferNewElement(chEle))
+      Array.prototype.slice
+        .call(ele.children)
+        .forEach(chEle => this.bufferNewElement(chEle))
     }
   }
 

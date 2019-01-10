@@ -207,7 +207,7 @@ export default class DOMMutationObserverClass extends BasicObserverClass
             // 当删除一个 textNode 或 所有文本内容时
             // when delete a whole textNode
             if (parentElement) {
-              nodeData.index = Array.from(parentElement.childNodes).indexOf(
+              nodeData.index = Array.prototype.slice.call(parentElement.childNodes).indexOf(
                 node
               )
             } else {
@@ -244,7 +244,7 @@ export default class DOMMutationObserverClass extends BasicObserverClass
 
   // filter out comment and script
   private nodesFilter(nodeList: NodeList): HTMLElement[] {
-    return Array.from(nodeList).filter(node => {
+    return Array.prototype.slice.call(nodeList).filter(node => {
       const { nodeName, tagName } = node as HTMLElement
       return nodeName !== '#comment' && tagName !== 'SCRIPT'
     }) as HTMLElement[]
@@ -252,7 +252,7 @@ export default class DOMMutationObserverClass extends BasicObserverClass
 
   // get index of the node, attention that .childNodes return textNodes also
   private getNodeIndex(parentElement: HTMLElement, node: ChildNode) {
-    return Array.from(parentElement.childNodes).indexOf(node)
+    return Array.prototype.slice.call(parentElement.childNodes).indexOf(node)
   }
 
   public install() {
