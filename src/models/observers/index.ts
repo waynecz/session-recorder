@@ -1,6 +1,6 @@
 export interface HighOrderObserver {
   name: string
-  status: { [key: string]: boolean } | boolean
+  status: { [key: string]: boolean | string[] } | boolean
   options?: boolean | object
 
   onobserved?(record: Record): void

@@ -23,6 +23,7 @@ export type EventObserveOptions = {
   scroll?: boolean
   resize?: boolean
   form?: boolean
+  domsWillScoll?: string[]
 }
 
 export type Listener = {

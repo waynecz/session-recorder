@@ -1,4 +1,4 @@
-import { RecorderOptions } from "models";
+import { RecorderOptions } from "./models";
 
 export const ID_KEY: string = 'recorder-id'
 

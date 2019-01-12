@@ -5,7 +5,7 @@ import { ElementX, FormELement } from '../models'
 import { _throttle, _log } from '../tools/helpers'
 import RecorderDocument from '../tools/dom-bufferer'
 import BasicObserverClass from './'
-import { RECORDER_OPTIONS } from '../constants';
+import { RECORDER_OPTIONS } from '../constants'
 
 const { getRecordIdByElement } = RecorderDocument
 
@@ -13,7 +13,8 @@ const { getRecordIdByElement } = RecorderDocument
  * Observe scroll, window resize, form field value change(input/textarea/radio etc.)
  * and produce an Record
  **/
-export default class EventObserverClass extends BasicObserverClass implements HighOrderObserver {
+export default class EventObserverClass extends BasicObserverClass
+  implements HighOrderObserver {
   public name: string = 'EventObserverClass'
   public listeners: Listener[] = []
   public options: EventObserveOptions = RECORDER_OPTIONS.event
@@ -45,7 +46,7 @@ export default class EventObserverClass extends BasicObserverClass implements Hi
     cb && cb()
   }
 
-  // Provide that document's direction is `rtl`(default) 
+  // Provide that document's direction is `rtl`(default)
   private getScrollPosition = (): { x: number; y: number } => {
     // Quirks mode on the contrary
     const isStandardsMode = document.compatMode === 'CSS1Compat'
@@ -66,7 +67,7 @@ export default class EventObserverClass extends BasicObserverClass implements Hi
 
     let record = { type: EventTypes.scroll } as EventReocrd
 
-    // 1. target is docuemnt 
+    // 1. target is docuemnt
     // 2. No event invoking
     if (target === document || !target) {
       let { x, y } = this.getScrollPosition()
@@ -126,9 +127,20 @@ export default class EventObserverClass extends BasicObserverClass implements Hi
   public install(): void {
     const { addListener } = this
 
-    const { scroll, resize, form } = this.options
+    const { scroll, resize, form, domsWillScoll } = this.options
 
     if (scroll) {
+      if (Array.isArray(domsWillScoll)) {
+        domsWillScoll.forEach(selector => {
+          addListener({
+            target: document.querySelector(selector),
+            event: 'scroll',
+            callback: _throttle(this.getScrollRecord),
+            options: true
+          })
+        })
+      }
+
       addListener({
         target: document,
         event: 'scroll',
@@ -137,6 +149,7 @@ export default class EventObserverClass extends BasicObserverClass implements Hi
       })
       this.status.scroll = true
       // get initial page's scroll position
+
       this.getScrollRecord()
     }
 

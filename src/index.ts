@@ -53,8 +53,8 @@ export default class RecorderClass implements Recorder {
     } = this.options
 
     Object.assign(this.observers, {
-      mutation: new DOMMutationObserverClass(mutation),
       console: new ConsoleObserverClass(consoleOpt),
+      mutation: new DOMMutationObserverClass(mutation),
       event: new EventObserverClass(event),
       mouse: new MouseObserverClass(mouse),
       http: new HttpObserverClass(http),
@@ -80,7 +80,6 @@ export default class RecorderClass implements Recorder {
   }
 
   public clearTrail = (): void => {
-    this.stop()
     this.trail = []
   }
 

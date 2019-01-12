@@ -103,7 +103,7 @@ export default class JSErrorObserverClass extends BasicObserverClass implements 
 
     const { $emit } = this
 
-    $emit('observed', record)
+    $emit('observed', record, errevt)
   }
 
   private getUnhandlerejectionRecord = (
@@ -122,7 +122,7 @@ export default class JSErrorObserverClass extends BasicObserverClass implements 
 
     const { $emit } = this
 
-    $emit('observed', record)
+    $emit('observed', record, errevt)
   }
 
   public install(): void {
