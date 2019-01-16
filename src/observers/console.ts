@@ -6,10 +6,11 @@ import {
   ConsoleLevels
 } from '../models/observers/console'
 import { _replace, _recover, _log } from '../tools/helpers'
-import BasicObserverClass from './';
-import { RECORDER_OPTIONS } from '../constants';
+import BasicObserverClass from './index'
+import { RECORDER_OPTIONS } from '../constants'
 
-export default class ConsoleObserverClass extends BasicObserverClass implements HighOrderObserver {
+export default class ConsoleObserverClass extends BasicObserverClass
+  implements HighOrderObserver {
   public name: string = 'ConsoleObserverClass'
   private consoleLevels: string[] = Object.keys(ConsoleLevels)
   public options: ConsoleObserveOptions = {
@@ -25,7 +26,9 @@ export default class ConsoleObserverClass extends BasicObserverClass implements 
     super()
     if (options === false) return
 
-    Object.assign(this.options, options)
+    if (typeof options === 'object') {
+      this.options = { ...this.options, ...options }
+    }
   }
 
   public install(): void {

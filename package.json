@@ -1,6 +1,6 @@
 {
   "name": "@waynecz/session-recorder",
-  "version": "0.0.2-alpha.7",
+  "version": "1.0.0",
   "description": "Record user interactions/js error/network/console in web",
   "main": "dist/index.js",
   "typings": "./dist/index.d.ts",

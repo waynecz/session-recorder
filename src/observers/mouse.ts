@@ -2,7 +2,7 @@ import { HighOrderObserver } from '../models/observers'
 import { MouseReocrd, MouseTypes } from '../models/observers/event'
 import { MouseObserverOptions, Listener } from '../models/observers/event'
 import { _throttle, _log } from '../tools/helpers'
-import BasicObserverClass from './'
+import BasicObserverClass from './index'
 import { RECORDER_OPTIONS } from '../constants'
 
 /**
@@ -24,7 +24,9 @@ export default class MouseObserverClass extends BasicObserverClass
     super()
     if (options === false) return
 
-    Object.assign(this.options, options)
+    if (typeof options === 'object') {
+      this.options = { ...this.options, ...options }
+    }
   }
 
   private addListener = (

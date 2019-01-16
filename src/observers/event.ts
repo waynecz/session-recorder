@@ -4,7 +4,7 @@ import { EventObserveOptions, Listener } from '../models/observers/event'
 import { ElementX, FormELement } from '../models'
 import { _throttle, _log } from '../tools/helpers'
 import RecorderDocument from '../tools/dom-bufferer'
-import BasicObserverClass from './'
+import BasicObserverClass from './index'
 import { RECORDER_OPTIONS } from '../constants'
 
 const { getRecordIdByElement } = RecorderDocument
@@ -25,7 +25,9 @@ export default class EventObserverClass extends BasicObserverClass
 
     if (options === false) return
 
-    Object.assign(this.options, options)
+    if (typeof options === 'object') {
+      this.options = { ...this.options, ...options }
+    }
   }
 
   /**

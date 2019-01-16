@@ -8,7 +8,7 @@ import { MutationRecordX } from '../models'
 import { ID_KEY } from '../constants'
 import RecorderDocument from '../tools/dom-bufferer'
 import { _log } from '../tools/helpers'
-import BasicObserverClass from './'
+import BasicObserverClass from './index'
 
 const { getRecordIdByElement } = RecorderDocument
 

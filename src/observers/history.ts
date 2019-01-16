@@ -1,7 +1,7 @@
 import { HighOrderObserver } from '../models/observers'
 import { _recover, _log, _parseURL, _replace } from '../tools/helpers'
 import { HistoryRecord, HistoryTypes } from '../models/observers/history'
-import BasicObserverClass from './'
+import BasicObserverClass from './index'
 
 export default class HistoryObserverClass extends BasicObserverClass implements HighOrderObserver {
   public name: string = 'HistoryObserverClass'

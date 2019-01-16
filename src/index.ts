@@ -26,7 +26,8 @@ export default class RecorderClass implements Recorder {
     event: null,
     mouse: null,
     error: null,
-    history: null
+    history: null,
+    http: null
   }
   public domTreeBufferer: DomTreeBufferer
   public MAX_TIME: number = 60000 // max record length(ms)
@@ -37,7 +38,7 @@ export default class RecorderClass implements Recorder {
 
   constructor(options?: RecorderOptions) {
     if (options) {
-      Object.assign(this.options, options)
+      this.options = { ...this.options, ...options }
     }
 
     this.domTreeBufferer = domTreeBufferer
@@ -52,7 +53,7 @@ export default class RecorderClass implements Recorder {
       mouse
     } = this.options
 
-    Object.assign(this.observers, {
+    this.observers = {
       console: new ConsoleObserverClass(consoleOpt),
       mutation: new DOMMutationObserverClass(mutation),
       event: new EventObserverClass(event),
@@ -60,7 +61,7 @@ export default class RecorderClass implements Recorder {
       http: new HttpObserverClass(http),
       error: new JSErrorObserverClass(error),
       history: new HistoryObserverClass(history)
-    })
+    }
 
     Object.keys(this.observers).forEach((observerName: ObserverName) => {
       const observer = this.observers[observerName]
@@ -88,17 +89,18 @@ export default class RecorderClass implements Recorder {
       _warn('record already started')
       return
     }
-    
+
     this.recording = true
 
     this.domTreeBufferer.takeSnapshotForPageDocument()
 
     Object.keys(this.observers).forEach(observerName => {
-      ;(this.observers[observerName] as HighOrderObserver).install()
+      if (this.options[observerName]) {
+        ;(this.observers[observerName] as HighOrderObserver).install()
+      }
     })
 
     this.baseTime = _now()
-
     ;(window as any).__SESSION_RECORDER__ = this
   }
 

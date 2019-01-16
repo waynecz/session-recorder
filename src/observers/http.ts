@@ -9,7 +9,7 @@ import {
 import { _replace, _recover, _newuuid, _log } from '../tools/helpers'
 import { RecorderWrappedXMLHttpRequest } from '../models'
 import { isFunction } from '../tools/is'
-import BasicObserverClass from './'
+import BasicObserverClass from './index'
 import { RECORDER_OPTIONS } from '../constants';
 
 export default class HttpObserverClass extends BasicObserverClass
@@ -30,7 +30,9 @@ export default class HttpObserverClass extends BasicObserverClass
 
     if (options === false) return
 
-    Object.assign(this.options, options)
+    if (typeof options === 'object') {
+      this.options = { ...this.options, ...options }
+    }
   }
 
   private isSupportBeacon(): boolean {

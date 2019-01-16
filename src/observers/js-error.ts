@@ -5,7 +5,7 @@ import {
   ErrorTypes
 } from '../models/observers/error'
 import { _replace, _log, _recover } from '../tools/helpers'
-import BasicObserverClass from './';
+import BasicObserverClass from './index';
 import { RECORDER_OPTIONS } from '../constants';
 
 // TODO: error stack trace compution
@@ -24,7 +24,9 @@ export default class JSErrorObserverClass extends BasicObserverClass implements 
 
     if (options === false) return
 
-    Object.assign(this.options, options)
+    if (typeof options === 'object') {
+      this.options = { ...this.options, ...options }
+    }
   }
 
   // TODO: generate stack of an error which is acceptable for sentry

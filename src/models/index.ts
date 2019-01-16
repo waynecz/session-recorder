@@ -40,6 +40,7 @@ export type ObserverName =
   | 'mouse'
   | 'error'
   | 'history'
+  | 'http'
 
 export type Observers = { [key in ObserverName]: BasicObserver }
 
