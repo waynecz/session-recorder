@@ -1,6 +1,10 @@
 import { HighOrderObserver } from '../models/observers'
-import { EventReocrd, EventTypes } from '../models/observers/event'
-import { EventObserveOptions, Listener } from '../models/observers/event'
+import {
+  EventObserveOptions,
+  Listener,
+  EventReocrd,
+  EventTypes
+} from '../models/observers/event'
 import { ElementX, FormELement } from '../models'
 import { _throttle, _log } from '../tools/helpers'
 import RecorderDocument from '../tools/dom-bufferer'
@@ -12,7 +16,7 @@ const { getRecordIdByElement } = RecorderDocument
 /**
  * Observe scroll, window resize, form field value change(input/textarea/radio etc.)
  * and produce an Record
- **/
+ */
 export default class EventObserverClass extends BasicObserverClass
   implements HighOrderObserver {
   public name: string = 'EventObserverClass'
@@ -63,7 +67,7 @@ export default class EventObserverClass extends BasicObserverClass
     return { x, y }
   }
 
-  private getScrollRecord = (evt?: Event): void => {
+  public getScrollRecord = (evt?: Event): void => {
     const { target } = evt || { target: document }
     const { $emit } = this
 
@@ -99,7 +103,8 @@ export default class EventObserverClass extends BasicObserverClass
     const { target } = evt
     const recorderId = getRecordIdByElement(target)
 
-    let k, v
+    let k: string
+    let v: any
 
     if (!recorderId) return
 
@@ -129,11 +134,11 @@ export default class EventObserverClass extends BasicObserverClass
   public install(): void {
     const { addListener } = this
 
-    const { scroll, resize, form, domsWillScoll } = this.options
+    const { scroll, resize, form, domsWillScroll } = this.options
 
     if (scroll) {
-      if (Array.isArray(domsWillScoll)) {
-        domsWillScoll.forEach(selector => {
+      if (Array.isArray(domsWillScroll)) {
+        domsWillScroll.forEach(selector => {
           addListener({
             target: document.querySelector(selector),
             event: 'scroll',

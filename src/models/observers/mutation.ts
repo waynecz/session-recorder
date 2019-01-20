@@ -1,4 +1,4 @@
-import { Record } from ".";
+import { Record } from '.'
 
 export enum DOMMutationTypes {
   attr = 'attr', // attribute mutate
@@ -9,10 +9,11 @@ export enum DOMMutationTypes {
 export interface NodeMutationData {
   index?: number // node's index in parentElement, include textNodes, may exist when add or remove
   type: 'text' | 'ele'
-  /** target, exist when node been removed */
-  target?: number 
+  /* target, exist when node been removed */
+  target?: number
   remaining?: string // exist when textNode been removed
-  /** index and html here only when it was an add operation */ 
+  /* index and html here only when it was an add operation */
+
   html?: string // addnode's html or text
 }
 

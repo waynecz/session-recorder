@@ -15,7 +15,6 @@ export interface BasicObserver {
   $emit(hook: string, ...args): void
 }
 
-
 export interface Record {
   t?: number // time
   type: string

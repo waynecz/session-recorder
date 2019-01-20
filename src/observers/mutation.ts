@@ -15,7 +15,7 @@ const { getRecordIdByElement } = RecorderDocument
 /**
  * Observe DOM change such as DOM-add/remove text-change attribute-change
  * and generate an Record
- **/
+ */
 export default class DOMMutationObserverClass extends BasicObserverClass
   implements HighOrderObserver {
   public name: string = 'DOMMutationObserverClass'
@@ -124,7 +124,7 @@ export default class DOMMutationObserverClass extends BasicObserverClass
    * @Or:
    * if a contenteditable textNode's text been all removed, type should be `childList`(remove #text),
    * later if you type/add some text in this empty textNode, the first mutation's type would be `childList`(add #text), fellows by `characterData`s
-   **/
+   */
   private getNodesRecord({
     target,
     addedNodes,
@@ -207,9 +207,9 @@ export default class DOMMutationObserverClass extends BasicObserverClass
             // 当删除一个 textNode 或 所有文本内容时
             // when delete a whole textNode
             if (parentElement) {
-              nodeData.index = Array.prototype.slice.call(parentElement.childNodes).indexOf(
-                node
-              )
+              nodeData.index = Array.prototype.slice
+                .call(parentElement.childNodes)
+                .indexOf(node)
             } else {
               nodeData.remaining = target.innerHTML
             }

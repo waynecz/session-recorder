@@ -4,7 +4,8 @@ import {
   Recorder,
   DomTreeBufferer,
   Observers,
-  ObserverName
+  ObserverName,
+  ElementX
 } from './models'
 
 import ConsoleObserverClass from './observers/console'
@@ -70,6 +71,17 @@ export default class RecorderClass implements Recorder {
     })
   }
 
+  public observeScroll = (ele: ElementX) => {
+    if (ele) {
+      ele.addEventListener(
+        'scroll',
+        (this.observers.event as any).getScrollRecord
+      )
+    } else {
+      _warn("Element doesn't existsed!")
+    }
+  }
+
   public pushToTrail = (record): void => {
     if (!this.recording) return
     record = { t: _now() - this.baseTime, ...record }
@@ -101,7 +113,7 @@ export default class RecorderClass implements Recorder {
     })
 
     this.baseTime = _now()
-    ;(window as any).__SESSION_RECORDER__ = this
+    ;(window as any).SessionRecorder = this
   }
 
   public stop = (): void => {

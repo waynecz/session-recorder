@@ -1,5 +1,5 @@
-import { ElementX } from "..";
-import { Record } from ".";
+import { ElementX } from '..'
+import { Record } from '.'
 
 export enum EventTypes {
   scroll = 'scroll',
@@ -8,22 +8,20 @@ export enum EventTypes {
 }
 
 export enum MouseTypes {
-
   click = 'click',
   move = 'move'
 }
 
 export type MouseObserverOptions = {
-  click?: boolean 
+  click?: boolean
   mousemove?: boolean
 }
-
 
 export type EventObserveOptions = {
   scroll?: boolean
   resize?: boolean
   form?: boolean
-  domsWillScoll?: string[]
+  domsWillScroll?: string[]
 }
 
 export type Listener = {

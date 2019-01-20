@@ -3,7 +3,7 @@ import { Record } from '.'
 export enum HttpRockets {
   beacon = 'beacon',
   fetch = 'fetch',
-  xhr = 'xhr',
+  xhr = 'xhr'
 }
 
 export enum HttpEndTypes {
@@ -12,13 +12,13 @@ export enum HttpEndTypes {
   xhrerror = 'xhrerror',
   xhrabort = 'xhrabort',
   xhrtimeout = 'xhrtimeout',
-  xhrend = 'xhrend',
+  xhrend = 'xhrend'
 }
 
 export type HttpObserveOptions = {
-  beacon?: boolean,
-  fetch?: boolean,
-  xhr?: boolean,
+  beacon?: boolean
+  fetch?: boolean
+  xhr?: boolean
 }
 
 export interface HttpStartRecord extends Record {

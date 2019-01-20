@@ -1,4 +1,4 @@
-import { Record } from ".";
+import { Record } from '.'
 
 export enum ConsoleLevels {
   info = 'info',
@@ -21,7 +21,7 @@ export type ConsoleObserveOptions = {
 }
 
 export interface ConsoleRecord extends Record {
-  type: ConsoleTypes,
+  type: ConsoleTypes
   l: ConsoleLevels // console level,
   msg?: any[]
 }
