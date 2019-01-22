@@ -1,11 +1,11 @@
-import { HighOrderObserver } from './models/observers'
 import {
+  HighOrderObserver,
   RecorderPreset,
   Recorder,
   Observers,
   ObserverName,
   ElementX
-} from './models'
+} from './models/index'
 import { _log, _warn, _now, _throttle } from './tools/helpers'
 import { RECORDER_DEFAULT_OPTIONS } from './constants'
 

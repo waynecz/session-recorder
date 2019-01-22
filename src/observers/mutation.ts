@@ -4,7 +4,7 @@ import {
   DOMMutationTypes,
   NodeMutationData,
   MutationRecordX
-} from '../models'
+} from '../models/index'
 import { ID_KEY } from '../constants'
 import NikonD7000 from '../tools/NikonD7000'
 import { _log } from '../tools/helpers'

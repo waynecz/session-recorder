@@ -6,7 +6,7 @@ import {
   HttpEndRecord,
   HttpEndTypes,
   RecorderWrappedXMLHttpRequest
-} from '../models'
+} from '../models/index'
 import { _replace, _recover, _newuuid, _log } from '../tools/helpers'
 import { isFunction } from '../tools/is'
 import BasicObserverClass from './index'

@@ -1,5 +1,5 @@
 import { isFunction } from '../tools/is'
-import { BasicObserver } from '../models'
+import { BasicObserver } from '../models/index'
 
 export default class BasicObserverClass implements BasicObserver {
   public queues: Map<string, Function[]> = new Map()

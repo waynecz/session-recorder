@@ -6,7 +6,7 @@ import {
   EventTypes,
   ElementX,
   FormELement
-} from '../models'
+} from '../models/index'
 import { _throttle, _log } from '../tools/helpers'
 import RecorderDocument from '../tools/NikonD7000'
 import BasicObserverClass from './index'

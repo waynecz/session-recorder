@@ -3,7 +3,7 @@ import {
   ErrorOptions,
   ErrorRecord,
   ErrorTypes
-} from '../models'
+} from '../models/index'
 import { _replace, _log, _recover } from '../tools/helpers'
 import BasicObserverClass from './index'
 import { RECORDER_DEFAULT_OPTIONS } from '../constants'

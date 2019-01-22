@@ -4,7 +4,7 @@ import {
   MouseTypes,
   MouseOptions,
   Listener
-} from '../models'
+} from '../models/index'
 import { _throttle, _log } from '../tools/helpers'
 import BasicObserverClass from './index'
 import { RECORDER_DEFAULT_OPTIONS } from '../constants'

@@ -4,7 +4,7 @@ import {
   ConsoleTypes,
   ConsoleRecord,
   ConsoleLevels
-} from '../models'
+} from '../models/index'
 import { _replace, _recover, _log } from '../tools/helpers'
 import BasicObserverClass from './index'
 import { RECORDER_DEFAULT_OPTIONS } from '../constants'

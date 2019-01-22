@@ -1,5 +1,5 @@
 import { _recover, _log, _parseURL, _replace } from '../tools/helpers'
-import { HighOrderObserver, HistoryRecord, HistoryTypes } from '../models'
+import { HighOrderObserver, HistoryRecord, HistoryTypes } from '../models/index'
 import BasicObserverClass from './index'
 
 export default class HistoryObserverClass extends BasicObserverClass
