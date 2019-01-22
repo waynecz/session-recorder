@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "typings": "./dist/index.d.ts",
   "scripts": {
-    "lint": "npx tslint --project tsconfig.json",
+    "lint": "npx tslint src/**/*",
     "dev": "npx webpack-dev-server --inline --config build/dev.js",
     "prebuild": "npm run lint && rimraf dist",
     "commit": "npx git-cz",

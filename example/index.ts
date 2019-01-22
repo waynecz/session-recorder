@@ -1,7 +1,6 @@
 import SessionRecorder from '../src'
 
 const myRecorder = new SessionRecorder({
-  http: { xhr: false, fetch: false },
   mutation: false,
   console: false
 } as any)

@@ -2,9 +2,7 @@ import {
   HighOrderObserver,
   HttpOptions,
   HttpRockets,
-  HttpStartRecord,
-  HttpEndRecord,
-  HttpEndTypes,
+  HttpRecord,
   RecorderWrappedXMLHttpRequest
 } from '../models/index'
 import { _replace, _recover, _newuuid, _log } from '../tools/helpers'
@@ -23,7 +21,7 @@ export default class HttpObserverClass extends BasicObserverClass
     xhr: false
   }
 
-  public xhrMap: Map<string, HttpStartRecord> = new Map()
+  private xhrRecordMap: Map<string, HttpRecord> = new Map()
 
   constructor(options: HttpOptions | boolean) {
     super()
@@ -51,7 +49,7 @@ export default class HttpObserverClass extends BasicObserverClass
         // more: https://developer.mozilla.org/en-US/docs/Web/API/Beacon_API/Using_the_Beacon_API
         const result: boolean = originalBeacon(url, data)
 
-        const record: HttpStartRecord = {
+        const record: HttpRecord = {
           type: HttpRockets.beacon,
           url
         }
@@ -79,7 +77,7 @@ export default class HttpObserverClass extends BasicObserverClass
         const requestId = _newuuid()
 
         let _method = 'GET'
-        let _url
+        let _url: string
 
         if (typeof input === 'string') {
           _url = input
@@ -95,16 +93,13 @@ export default class HttpObserverClass extends BasicObserverClass
           _method = config.method
         }
 
-        let startReocrd = {
+        const record = {
           type: HttpRockets.fetch,
           method: _method,
           url: _url,
           id: requestId,
           input: [...arguments]
-        } as HttpStartRecord
-
-        // record before fetch
-        $emit('observed', startReocrd)
+        } as HttpRecord
 
         return (
           originalFetch
@@ -113,26 +108,18 @@ export default class HttpObserverClass extends BasicObserverClass
             // it will reject solely when a network error or CORS misconfigured occurred
             // more: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#Checking_that_the_fetch_was_successful
             .then((response: Response) => {
-              let endReocrd = {
-                type: HttpEndTypes.fetchend,
-                id: requestId
-              } as HttpEndRecord
+              record.status = response.status
+              record.response = response.json()
 
-              endReocrd.status = response.status
-
-              $emit('observed', endReocrd)
+              $emit('observed', record)
 
               return response
             })
             .catch((error: Error) => {
               const { message } = error
-              const errRecord: HttpEndRecord = {
-                type: HttpEndTypes.fetcherror,
-                id: requestId,
-                errmsg: message
-              }
+              record.errmsg = message
 
-              $emit('observed', errRecord)
+              $emit('observed', record)
 
               throw error
             })
@@ -153,19 +140,36 @@ export default class HttpObserverClass extends BasicObserverClass
 
         const args = [...arguments]
 
-        let startRecord = {
+        let record = {
           type: HttpRockets.xhr,
           id: requestId,
           url,
           method,
-          input: args
-        } as HttpStartRecord
+          headers: {}
+        } as HttpRecord
 
         this.__id__ = requestId
 
-        self.xhrMap.set(requestId, startRecord)
+        self.xhrRecordMap.set(requestId, record)
 
         return originalOpen.apply(this, args)
+      }
+    }
+
+    function XHRSetRequestHeaderReplacement(originalSetter) {
+      return function(
+        this: RecorderWrappedXMLHttpRequest,
+        key: string,
+        value: any
+      ) {
+        const requestId = this.__id__
+        const record = self.xhrRecordMap.get(requestId)
+
+        if (record) {
+          record.headers[key] = value
+        }
+
+        originalSetter.call(this, key, value)
       }
     }
 
@@ -174,26 +178,25 @@ export default class HttpObserverClass extends BasicObserverClass
         const thisXHR = this
         const { __id__: requestId, __skip_record__ } = thisXHR
 
-        let startRecord = self.xhrMap.get(requestId)
+        let thisRecord = self.xhrRecordMap.get(requestId)
 
         // skip recorder's own request
-        if (startRecord && !__skip_record__) {
-          startRecord.input = body
-          // record before send
-          $emit('observed', startRecord)
+        if (thisRecord && !__skip_record__) {
+          thisRecord.payload = body
         }
 
         function onreadystatechangeHandler(): void {
           if (this.readyState === 4) {
             if (this.__skip_record__) return
 
-            const endRecord: HttpEndRecord = {
-              type: HttpEndTypes.xhrend,
-              id: requestId,
-              status: this.status
-            }
+            const record = self.xhrRecordMap.get(requestId)
 
-            $emit('observed', endRecord)
+            if (record) {
+              record.status = thisXHR.status
+              record.response = thisXHR.responseText || thisXHR.response
+              // xhr send successfully
+              $emit('observed', record)
+            }
           }
         }
 
@@ -219,19 +222,21 @@ export default class HttpObserverClass extends BasicObserverClass
         } catch (exception) {
           // if an exception occured after send, count in thisXHR
           const { message } = exception as TypeError | RangeError | EvalError
-          const errRecord: HttpEndRecord = {
-            type: HttpEndTypes.xhrerror,
-            id: requestId,
-            errmsg: message
-          }
 
-          $emit('observed', errRecord)
+          const record = self.xhrRecordMap.get(requestId)
+
+          if (record) {
+            record.errmsg = message
+            // xhr send error
+            $emit('observed', record)
+          }
         }
       }
     }
 
     const XHRProto = XMLHttpRequest.prototype
 
+    _replace(XHRProto, 'setRequestHeader', XHRSetRequestHeaderReplacement)
     _replace(XHRProto, 'open', XHROpenReplacement)
     _replace(XHRProto, 'send', XHRSendReplacement)
   }

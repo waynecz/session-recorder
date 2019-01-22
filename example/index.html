@@ -45,10 +45,36 @@
       <div class="radio"><input type="radio" name="a" /><input type="radio" name="a" /></div>
     </form>
 
-    <iframe src="https://god.faas.elenet.me" frameborder="0"></iframe>
+    <!-- <iframe src="https://god.faas.elenet.me" frameborder="0"></iframe> -->
 
     <div contenteditable>venom a <a href="://baidu.com">baidu</a></div>
 
     <div contenteditable=""></div>
+
+    <script>
+      setTimeout(() => {
+        const xhr = new XMLHttpRequest()
+
+        xhr.open('GET', 'https://god.faas.elenet.me/api/apis/v1/user?a=1&b=2')
+
+        xhr.withCredentials = true
+
+        // xhr.setRequestHeader('X-ELEME-ID', 'fakeid')
+        // xhr.setRequestHeader('Content-Type', 'application/json;UTF-8')
+
+        xhr.send(JSON.stringify({ a: 2 }))
+      }, 1000)
+
+      setTimeout(() => {
+        const xhr = new XMLHttpRequest()
+
+        fetch('https://god.faas.elenet.me/api/apis/v1/user', {
+          headers: {
+            'Content-Type': 'application/xxx;UTF-8'
+          },
+          credentials: 'include'
+        })
+      }, 1000)
+    </script>
   </body>
 </html>

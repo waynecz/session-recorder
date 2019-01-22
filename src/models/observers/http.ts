@@ -21,16 +21,15 @@ export type HttpOptions = {
   xhr?: boolean
 }
 
-export interface HttpStartRecord extends Record {
+export interface HttpRecord extends Record {
   type: HttpRockets
   id?: string // beacon record has no id
   url: string
-  input?: any[] // request arguments
+  headers?: { [key: string]: any } // nonexistence in beacon request
+  input?: any[] // fetch request payload
+  payload?: any // xhr request payload
+  response?: any
   method?: string
-}
-export interface HttpEndRecord extends Record {
-  type: HttpEndTypes
-  id: string
   status?: number
   errmsg?: any
 }

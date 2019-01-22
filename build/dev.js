@@ -22,7 +22,7 @@ const devConfig = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'index.html',
-      inject: true
+      inject: 'head'
     }),
 
     new CopyWebpackPlugin([
