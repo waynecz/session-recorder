@@ -43,11 +43,11 @@ export default class HttpObserverClass extends BasicObserverClass
     const { $emit } = this
 
     function beaconReplacement(originalBeacon) {
-      return function(url: string, data): boolean {
+      return function(this: Navigator, url: string, data): boolean {
         // Copy from sentry javascript
         // If the browser successfully queues the request for delivery, the method returns "true" and returns "false" otherwise.
         // more: https://developer.mozilla.org/en-US/docs/Web/API/Beacon_API/Using_the_Beacon_API
-        const result: boolean = originalBeacon(url, data)
+        const result: boolean = originalBeacon.call(this, url, data)
 
         const record: HttpRecord = {
           type: HttpRockets.beacon,
