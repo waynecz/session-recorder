@@ -15,6 +15,6 @@
     "baseUrl": "src",
     "lib": ["dom", "es2017", "es2018"]
   },
-  "include": ["src/**/*", "example/*"],
-  "exclude": ["dist", "node_modules", "**/*.spec.ts"]
+  "include": ["src/**/*"],
+  "exclude": ["dist", "node_modules", "**/*.spec.ts", "example/index"]
 }
