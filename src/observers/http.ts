@@ -1,23 +1,23 @@
-import { HighOrderObserver } from '../models/observers'
 import {
-  HttpObserveOptions,
+  HighOrderObserver,
+  HttpOptions,
   HttpRockets,
   HttpStartRecord,
   HttpEndRecord,
-  HttpEndTypes
-} from '../models/observers/http'
+  HttpEndTypes,
+  RecorderWrappedXMLHttpRequest
+} from '../models'
 import { _replace, _recover, _newuuid, _log } from '../tools/helpers'
-import { RecorderWrappedXMLHttpRequest } from '../models'
 import { isFunction } from '../tools/is'
 import BasicObserverClass from './index'
-import { RECORDER_OPTIONS } from '../constants';
+import { RECORDER_DEFAULT_OPTIONS } from '../constants'
 
 export default class HttpObserverClass extends BasicObserverClass
   implements HighOrderObserver {
   public name: string = 'HttpObserverClass'
   public active: boolean
-  public options: HttpObserveOptions = RECORDER_OPTIONS.http
-  public status: HttpObserveOptions = {
+  public options: HttpOptions = RECORDER_DEFAULT_OPTIONS.http
+  public status: HttpOptions = {
     beacon: false,
     fetch: false,
     xhr: false
@@ -25,7 +25,7 @@ export default class HttpObserverClass extends BasicObserverClass
 
   public xhrMap: Map<string, HttpStartRecord> = new Map()
 
-  constructor(options: HttpObserveOptions | boolean) {
+  constructor(options: HttpOptions | boolean) {
     super()
 
     if (options === false) return
@@ -46,7 +46,7 @@ export default class HttpObserverClass extends BasicObserverClass
 
     function beaconReplacement(originalBeacon) {
       return function(url: string, data): boolean {
-        // Copy from sentry
+        // Copy from sentry javascript
         // If the browser successfully queues the request for delivery, the method returns "true" and returns "false" otherwise.
         // more: https://developer.mozilla.org/en-US/docs/Web/API/Beacon_API/Using_the_Beacon_API
         const result: boolean = originalBeacon(url, data)
@@ -144,8 +144,6 @@ export default class HttpObserverClass extends BasicObserverClass
   }
 
   private hijackXHR() {
-    if (!('XMLHttpRequest' in window)) return
-
     const { $emit } = this
     const self = this
 

@@ -1,25 +1,26 @@
-import { HighOrderObserver } from '../models/observers'
 import {
-  ErrorObserveOptions,
+  HighOrderObserver,
+  ErrorOptions,
   ErrorRecord,
   ErrorTypes
-} from '../models/observers/error'
+} from '../models'
 import { _replace, _log, _recover } from '../tools/helpers'
-import BasicObserverClass from './index';
-import { RECORDER_OPTIONS } from '../constants';
+import BasicObserverClass from './index'
+import { RECORDER_DEFAULT_OPTIONS } from '../constants'
 
 // TODO: error stack trace compution
-export default class JSErrorObserverClass extends BasicObserverClass implements HighOrderObserver {
+export default class JSErrorObserverClass extends BasicObserverClass
+  implements HighOrderObserver {
   public name: string = 'JSErrorObserverClass'
-  public options: ErrorObserveOptions = RECORDER_OPTIONS.error
+  public options: ErrorOptions = RECORDER_DEFAULT_OPTIONS.error
 
-  public status: ErrorObserveOptions = {
+  public status: ErrorOptions = {
     jserror: false,
     unhandledrejection: false
   }
   public active: boolean
 
-  constructor(options: ErrorObserveOptions | boolean) {
+  constructor(options: ErrorOptions | boolean) {
     super()
 
     if (options === false) return
@@ -30,7 +31,9 @@ export default class JSErrorObserverClass extends BasicObserverClass implements 
   }
 
   // TODO: generate stack of an error which is acceptable for sentry
-  public getStackTeace() {}
+  public getStackTeace() {
+    /* TODO */
+  }
 
   private installGlobalerrorHandler(): void {
     const { getGlobalerrorReocrd } = this
@@ -47,7 +50,7 @@ export default class JSErrorObserverClass extends BasicObserverClass implements 
          * "For historical reasons, different arguments are passed to window.onerror and element.onerror handlers"
          *  more: - https://blog.sentry.io/2016/01/04/client-javascript-reporting-window-onerror
          *       - https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror#Syntax
-         **/
+         */
         if (error && error instanceof ErrorEvent) {
           getGlobalerrorReocrd(error)
         } else if (message instanceof ErrorEvent) {

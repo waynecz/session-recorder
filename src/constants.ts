@@ -1,8 +1,8 @@
-import { RecorderOptions } from "./models";
+import { RecorderOptions } from './models'
 
 export const ID_KEY: string = 'recorder-id'
 
-export const RECORDER_OPTIONS: RecorderOptions = {
+export const RECORDER_DEFAULT_OPTIONS: RecorderOptions = {
   mutation: true,
   history: true,
   error: {

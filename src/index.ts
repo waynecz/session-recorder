@@ -1,12 +1,13 @@
 import { HighOrderObserver } from './models/observers'
 import {
-  RecorderOptions,
+  RecorderPreset,
   Recorder,
-  DomTreeBufferer,
   Observers,
   ObserverName,
   ElementX
 } from './models'
+import { _log, _warn, _now, _throttle } from './tools/helpers'
+import { RECORDER_DEFAULT_OPTIONS } from './constants'
 
 import ConsoleObserverClass from './observers/console'
 import EventObserverClass from './observers/event'
@@ -15,12 +16,10 @@ import DOMMutationObserverClass from './observers/mutation'
 import JSErrorObserverClass from './observers/js-error'
 import HistoryObserverClass from './observers/history'
 import MouseObserverClass from './observers/mouse'
-import domTreeBufferer from './tools/dom-bufferer'
-import { _log, _warn, _now } from './tools/helpers'
-import { RECORDER_OPTIONS } from './constants'
+
+import NikonD7000 from './tools/NikonD7000'
 
 export default class RecorderClass implements Recorder {
-  public trail: any[] = []
   public observers: Observers = {
     mutation: null,
     console: null,
@@ -30,19 +29,21 @@ export default class RecorderClass implements Recorder {
     history: null,
     http: null
   }
-  public domTreeBufferer: DomTreeBufferer
-  public MAX_TIME: number = 60000 // max record length(ms)
-  public options: RecorderOptions = RECORDER_OPTIONS
-  public baseTime: number = 0
-
+  public options: RecorderPreset = RECORDER_DEFAULT_OPTIONS
+  public trail: any[] = []
   public recording: boolean = false
+  private baseTime: number = 0
 
-  constructor(options?: RecorderOptions) {
+  public maxTimeSpan: number = 60000 // limit time of recording
+  private lastSnapshot: { time: number; index: number } = {
+    time: 0,
+    index: 0
+  }
+
+  constructor(options?: RecorderPreset) {
     if (options) {
       this.options = { ...this.options, ...options }
     }
-
-    this.domTreeBufferer = domTreeBufferer
 
     const {
       mutation,
@@ -75,25 +76,53 @@ export default class RecorderClass implements Recorder {
     if (ele) {
       ele.addEventListener(
         'scroll',
-        (this.observers.event as any).getScrollRecord
+        _throttle((this.observers.event as any).getScrollRecord)
       )
     } else {
       _warn("Element doesn't existsed!")
     }
   }
 
-  public pushToTrail = (record): void => {
+  private pushToTrail = (record): void => {
     if (!this.recording) return
-    record = { t: _now() - this.baseTime, ...record }
-    // limit the time of trail
-    if (this.trail.length && record.t - this.trail[0].t > this.MAX_TIME) {
-      this.trail.shift()
+
+    const thisRecordTime = _now() - this.baseTime
+
+    record = { t: thisRecordTime, ...record }
+    const {
+      time: lastSnapshotTime,
+      index: lastSnapshotIndex
+    } = this.lastSnapshot
+
+    if (thisRecordTime - lastSnapshotTime >= this.maxTimeSpan / 2) {
+      if (lastSnapshotIndex !== 0) {
+        this.trail = this.trail.slice(lastSnapshotIndex)
+      }
+
+      const snapshotRecord = this.getSnapshotRecord()
+      this.trail.push(snapshotRecord)
     }
+
     this.trail.push(record)
   }
 
-  public clearTrail = (): void => {
-    this.trail = []
+  private getSnapshotRecord() {
+    this.lastSnapshot.time = _now() - this.baseTime
+    this.lastSnapshot.index = this.trail.length
+
+    const { clientWidth: w, clientHeight: h } = document.documentElement
+    const { x, y } = (this.observers.event as any).getScrollPosition()
+
+    return {
+      t: this.lastSnapshot.time,
+      type: 'snapshot',
+      scroll: { x, y },
+      resize: {
+        w,
+        h
+      },
+      snapshot: NikonD7000.takeSnapshotForPage()
+    }
   }
 
   public start = (): void => {
@@ -104,15 +133,15 @@ export default class RecorderClass implements Recorder {
 
     this.recording = true
 
-    this.domTreeBufferer.takeSnapshotForPageDocument()
+    this.trail[0] = this.getSnapshotRecord()
+
+    this.baseTime = _now()
 
     Object.keys(this.observers).forEach(observerName => {
       if (this.options[observerName]) {
         ;(this.observers[observerName] as HighOrderObserver).install()
       }
     })
-
-    this.baseTime = _now()
     ;(window as any).SessionRecorder = this
   }
 
@@ -123,6 +152,9 @@ export default class RecorderClass implements Recorder {
     }
 
     this.recording = false
+
+    // clear trail
+    this.trail.length = 0
   }
 
   public uninstallObservers = (): void => {
@@ -132,5 +164,3 @@ export default class RecorderClass implements Recorder {
     })
   }
 }
-
-;(window as any).Recorder = RecorderClass

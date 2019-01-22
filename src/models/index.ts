@@ -1,12 +1,12 @@
-import { ConsoleObserveOptions } from './observers/console'
-import { EventObserveOptions, MouseObserverOptions } from './observers/event'
-import { HttpObserveOptions } from './observers/http'
-import { ErrorObserveOptions } from './observers/error'
+import { ConsoleOptions } from './observers/console'
+import { EventOptions, MouseOptions } from './observers/event'
+import { HttpOptions } from './observers/http'
+import { ErrorOptions } from './observers/error'
 import { BasicObserver } from './observers'
 
 export type ElementX = HTMLElement | Element
 
-// MutationRecord's target is Node type that doesn't have `getAttribute`/tagName etc
+// MutationRecord's target is Node type that doesn't have `getAttribute` / `tagName` etc
 // HTMLElement > Element > ChildNode > Node
 export interface MutationRecordX extends MutationRecord {
   target: HTMLElement
@@ -45,33 +45,36 @@ export type ObserverName =
 export type Observers = { [key in ObserverName]: BasicObserver }
 
 export interface Recorder {
-  domTreeBufferer: DomTreeBufferer
+  NikonD7000?: D7000
   trail: any[]
   observers: Observers
-  MAX_TIME: number
-  baseTime: number
-  options: RecorderOptions
+  options: RecorderPreset
   recording: boolean
+  maxTimeSpan: number
 
   start: () => void
   stop: () => void
-  clearTrail: () => void
-  pushToTrail: (record: any) => void
+}
+
+export type RecorderPreset = {
+  [key in keyof RecorderOptions]: RecorderOptions[key] | boolean
 }
 
 export type RecorderOptions = {
-  console?: ConsoleObserveOptions
-  event?: EventObserveOptions
-  mouse?: MouseObserverOptions
-  http?: HttpObserveOptions
-  error?: ErrorObserveOptions
+  console?: ConsoleOptions
+  event?: EventOptions
+  mouse?: MouseOptions
+  http?: HttpOptions
+  error?: ErrorOptions
   history?: boolean
   mutation?: boolean
 }
 
-export interface DomTreeBufferer {
-  domSnapshot: string
+export interface D7000 {
+  latestSnapshot: string
   inited: boolean
 
-  takeSnapshotForPageDocument(): void
+  takeSnapshotForPage(): void
 }
+
+export * from './observers/index'

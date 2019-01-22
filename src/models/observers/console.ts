@@ -12,7 +12,7 @@ export enum ConsoleTypes {
   console = 'console'
 }
 
-export type ConsoleObserveOptions = {
+export type ConsoleOptions = {
   info?: boolean
   warn?: boolean
   error?: boolean

@@ -1,47 +1,42 @@
 import { ID_KEY } from '../constants'
-import { ElementX, DomTreeBufferer } from '../models'
+import { ElementX, D7000 } from '../models'
 
 /**
- * 1.Store initial document string with mark
- * 2.Create Map<node, id> for every node in DOM
- * 3.Add / Remove recorderId
- **/
-class DomTreeBuffererClass implements DomTreeBufferer {
+ * Nikon D7000 DSLR is a camera with abilities list below:
+ * @feature take snapshot for page
+ * @feature buffer every node in document up in Map<node, id> format
+ * @feature mark / unmark node with unique ID
+ */
+class NikonD7000DSLRClass implements D7000 {
   public map: Map<
     HTMLElement | Element | Node | EventTarget,
     number
   > = new Map()
-  public domSnapshot: string
+  public latestSnapshot: string
   public inited: boolean = false
   private id: number = 0 // self-increase id
 
-  constructor() {}
+  public takeSnapshotForPage(): string {
+    console.time('[Snapshot for page]')
 
-  public takeSnapshotForPageDocument() {
-    const action = () => {
-      console.time('[Document snapshot]')
+    // Buffer every element into the Map
+    // Note that textNodes wouldn't been included !!
+    Array.prototype.slice
+      .call(document.querySelectorAll('*'))
+      .forEach(this.buffer)
 
-      // Buffer every element into the Map
-      // Note that textNodes wouldn't been included !!
-      Array.prototype.slice.call(document.all).forEach(this.buffer)
+    this.latestSnapshot = document.documentElement.outerHTML
 
-      this.domSnapshot = document.documentElement.outerHTML
-
-      // remove id from node
-      Array.prototype.slice.call(document.all).forEach((node: HTMLElement) => {
+    // remove id from node
+    Array.prototype.slice
+      .call(document.querySelectorAll('*'))
+      .forEach((node: HTMLElement) => {
         this.unmark(node)
       })
 
-      this.inited = true
+    console.timeEnd('[Snapshot for page]')
 
-      console.timeEnd('[Document snapshot]')
-    }
-
-    if (['complete', 'interactive'].indexOf(document.readyState) !== -1) {
-      action()
-    } else {
-      document.addEventListener('DOMContentLoaded', action)
-    }
+    return this.latestSnapshot
   }
 
   private newId(): number {
@@ -71,7 +66,6 @@ class DomTreeBuffererClass implements DomTreeBufferer {
     this.map.set(ele, recorderId)
 
     this.mark(ele, recorderId)
-
     return recorderId
   }
 
@@ -95,6 +89,6 @@ class DomTreeBuffererClass implements DomTreeBufferer {
   }
 }
 
-const documentBufferer = new DomTreeBuffererClass()
+const NikonD7000 = new NikonD7000DSLRClass()
 
-export default documentBufferer
+export default NikonD7000

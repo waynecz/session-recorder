@@ -5,7 +5,7 @@ export enum ErrorTypes {
   unhandledrejection = 'unhandledrejection'
 }
 
-export type ErrorObserveOptions = {
+export type ErrorOptions = {
   jserror: boolean
   unhandledrejection: boolean
 }
@@ -13,7 +13,7 @@ export type ErrorObserveOptions = {
 export interface ErrorRecord extends Record {
   type: ErrorTypes
   msg: string
-   // fields below existedy only if type === jserr
+  // fields below existed only when type === jserr
   url?: string
   line?: string
   err?: any

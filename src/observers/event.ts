@@ -1,15 +1,16 @@
-import { HighOrderObserver } from '../models/observers'
 import {
-  EventObserveOptions,
+  HighOrderObserver,
+  EventOptions,
   Listener,
   EventReocrd,
-  EventTypes
-} from '../models/observers/event'
-import { ElementX, FormELement } from '../models'
+  EventTypes,
+  ElementX,
+  FormELement
+} from '../models'
 import { _throttle, _log } from '../tools/helpers'
-import RecorderDocument from '../tools/dom-bufferer'
+import RecorderDocument from '../tools/NikonD7000'
 import BasicObserverClass from './index'
-import { RECORDER_OPTIONS } from '../constants'
+import { RECORDER_DEFAULT_OPTIONS } from '../constants'
 
 const { getRecordIdByElement } = RecorderDocument
 
@@ -21,10 +22,10 @@ export default class EventObserverClass extends BasicObserverClass
   implements HighOrderObserver {
   public name: string = 'EventObserverClass'
   public listeners: Listener[] = []
-  public options: EventObserveOptions = RECORDER_OPTIONS.event
-  public status: EventObserveOptions = RECORDER_OPTIONS.event
+  public options: EventOptions = RECORDER_DEFAULT_OPTIONS.event
+  public status: EventOptions = RECORDER_DEFAULT_OPTIONS.event
 
-  constructor(options: EventObserveOptions | boolean) {
+  constructor(options: EventOptions | boolean) {
     super()
 
     if (options === false) return
@@ -38,7 +39,7 @@ export default class EventObserverClass extends BasicObserverClass
    * @param option useCapture or AddEventListenerOptions
    */
   public addListener = (
-    { target, event, callback, options = false }: Listener,
+    { target, event, callback, options }: Listener,
     cb?: () => void
   ) => {
     target.addEventListener(event, callback, options)
@@ -53,7 +54,7 @@ export default class EventObserverClass extends BasicObserverClass
   }
 
   // Provide that document's direction is `rtl`(default)
-  private getScrollPosition = (): { x: number; y: number } => {
+  public getScrollPosition = (): { x: number; y: number } => {
     // Quirks mode on the contrary
     const isStandardsMode = document.compatMode === 'CSS1Compat'
 
@@ -91,7 +92,7 @@ export default class EventObserverClass extends BasicObserverClass
     $emit('observed', record)
   }
 
-  private getResizeRecord = (): void => {
+  public getResizeRecord = (): void => {
     const { clientWidth: w, clientHeight: h } = document.documentElement
     const record: EventReocrd = { type: EventTypes.resize, w, h }
     const { $emit } = this
@@ -101,6 +102,9 @@ export default class EventObserverClass extends BasicObserverClass
 
   private getFormChangeRecord = (evt: Event): void => {
     const { target } = evt
+    if ((target as HTMLElement).contentEditable === 'true') {
+      return
+    }
     const recorderId = getRecordIdByElement(target)
 
     let k: string
@@ -151,13 +155,10 @@ export default class EventObserverClass extends BasicObserverClass
       addListener({
         target: document,
         event: 'scroll',
-        callback: _throttle(this.getScrollRecord),
+        callback: _throttle(this.getScrollRecord, 80),
         options: true
       })
       this.status.scroll = true
-      // get initial page's scroll position
-
-      this.getScrollRecord()
     }
 
     if (resize) {
@@ -167,8 +168,6 @@ export default class EventObserverClass extends BasicObserverClass
         callback: _throttle(this.getResizeRecord)
       })
       this.status.resize = true
-      /** Get viewport size at the begining */
-      this.getResizeRecord()
     }
 
     if (form) {
@@ -176,6 +175,14 @@ export default class EventObserverClass extends BasicObserverClass
         target: document,
         event: 'change',
         callback: this.getFormChangeRecord,
+        options: true
+      })
+
+      // input event fires when value of <input> <select> <textarea> element has been altered.
+      addListener({
+        target: document,
+        event: 'input',
+        callback: _throttle(this.getFormChangeRecord),
         options: true
       })
       this.status.form = true

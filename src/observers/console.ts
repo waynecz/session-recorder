@@ -1,28 +1,28 @@
-import { HighOrderObserver } from '../models/observers'
 import {
-  ConsoleObserveOptions,
+  HighOrderObserver,
+  ConsoleOptions,
   ConsoleTypes,
   ConsoleRecord,
   ConsoleLevels
-} from '../models/observers/console'
+} from '../models'
 import { _replace, _recover, _log } from '../tools/helpers'
 import BasicObserverClass from './index'
-import { RECORDER_OPTIONS } from '../constants'
+import { RECORDER_DEFAULT_OPTIONS } from '../constants'
 
 export default class ConsoleObserverClass extends BasicObserverClass
   implements HighOrderObserver {
   public name: string = 'ConsoleObserverClass'
   private consoleLevels: string[] = Object.keys(ConsoleLevels)
-  public options: ConsoleObserveOptions = {
+  public options: ConsoleOptions = {
     info: true,
     error: true,
     log: false,
     warn: true,
     debug: false
   }
-  public status = RECORDER_OPTIONS.console
+  public status = RECORDER_DEFAULT_OPTIONS.console
 
-  constructor(options: ConsoleObserveOptions | boolean) {
+  constructor(options: ConsoleOptions | boolean) {
     super()
     if (options === false) return
 
@@ -35,7 +35,7 @@ export default class ConsoleObserverClass extends BasicObserverClass
     const { status, $emit } = this
 
     this.consoleLevels.forEach(
-      (level: keyof ConsoleObserveOptions): void => {
+      (level: keyof ConsoleOptions): void => {
         if (!this.options[level]) return
 
         function consoleReplacement(originalConsoleFunc: Function) {
@@ -66,7 +66,7 @@ export default class ConsoleObserverClass extends BasicObserverClass
 
   public uninstall(): void {
     this.consoleLevels.forEach(
-      (level: keyof ConsoleObserveOptions): void => {
+      (level: keyof ConsoleOptions): void => {
         if (!this.options[level]) return
 
         _recover(console, level)

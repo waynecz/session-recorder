@@ -1,16 +1,16 @@
-import { HighOrderObserver } from '../models/observers'
 import {
+  HighOrderObserver,
   DOMMutationRecord,
   DOMMutationTypes,
-  NodeMutationData
-} from '../models/observers/mutation'
-import { MutationRecordX } from '../models'
+  NodeMutationData,
+  MutationRecordX
+} from '../models'
 import { ID_KEY } from '../constants'
-import RecorderDocument from '../tools/dom-bufferer'
+import NikonD7000 from '../tools/NikonD7000'
 import { _log } from '../tools/helpers'
 import BasicObserverClass from './index'
 
-const { getRecordIdByElement } = RecorderDocument
+const { getRecordIdByElement } = NikonD7000
 
 /**
  * Observe DOM change such as DOM-add/remove text-change attribute-change
@@ -81,36 +81,39 @@ export default class DOMMutationObserverClass extends BasicObserverClass
     record.type = DOMMutationTypes.text
 
     record.target = getRecordIdByElement(target)
-
-    // 比如文本修改是在一个 contenteditable 的 `元素A` 内发生，
-    // 并且 `元素A` 内有 textNode 和 element 同时存在，
-    // 当只修改某个 textNode 时，MutationObserver 给的 target 会指向这个 textNode，
-    // 所以 record.target 在上面代码中 getRecordIdByElement 时会取到 undefined (因为 document bufferer 字典内只缓存 element)，
-    // 这时我们将 record.target 指向 `元素A` ，
-    // record.html 取 `元素A` 的 innerHTML。
-    // --------------------------------------------------------------------------------------------------
-    // When the mutation happen with contenteditable `elementA` which contains textNodes and element inside,
-    // NOTE that MutationObserver will point the `target` to the textNode we modified,
-    // therefore, we should get undefined of `getRecordIdByElement(target)` (since document bufferer didn't buffer textNode).
-    // So we manually set record.target = `elementA`,
-    // and record.html = elementA.innerHTML at the same time
+    /**
+     * 比如文本修改是在一个 contenteditable 的 `元素A` 内发生，
+     * 并且 `元素A` 内有 textNode 和 element 同时存在，
+     * 当只修改某个 textNode 时，MutationObserver 给的 target 会指向这个 textNode，
+     * 所以 record.target 在上面代码中 getRecordIdByElement 时会取到 undefined (因为 document bufferer 字典内只缓存 element)，
+     * 这时我们将 record.target 指向 `元素A` ，
+     * record.html 取 `元素A` 的 innerHTML。
+     * --------------------------------------------------------------------------------------------------
+     * When the mutation happen with contenteditable `elementA` which contains textNodes and element inside,
+     * NOTE that MutationObserver will point the `target` to the textNode we modified,
+     * therefore, we should get undefined of `getRecordIdByElement(target)` (since document bufferer didn't buffer textNode).
+     * So we manually set record.target = `elementA`,
+     * and record.html = elementA.innerHTML at the same time
+     */
     if (!record.target) {
       const parentEle = getRecordIdByElement(target.parentElement)
-      // 如果这时候取不到 parentEle 或者 target.parentElement 为 null，则视该条记录作废
-      // 这种情况会在删除整个 textNode 时发生，可以忽略，
-      // 因为这个动作会额外的生成一个类型为 childList 的 MutationRecord
-      // 交给 this.getNodesRecord 处理就好
-      // ----------------------------------------------------------------
-      // if (parentEle === null), means the textNode has been removed,
-      // this mutation would produce a MutationRecord with type === 'childList',
-      // just leave it to this.getNodesRecord to handle :)
+      /**
+       * 如果这时候取不到 parentEle 或者 target.parentElement 为 null，则视该条记录作废
+       * 这种情况会在删除整个 textNode 时发生，可以忽略，
+       * 因为这个动作会额外的生成一个类型为 childList 的 MutationRecord
+       * 交给 this.getNodesRecord 处理就好
+       * ----------------------------------------------------------------
+       * if (parentEle === null), means the textNode has been removed,
+       * this mutation would produce a MutationRecord with type === 'childList',
+       * just leave it to this.getNodesRecord to handle :)
+       */
       if (!parentEle) {
         return
       }
       record.target = parentEle
       record.html = target.parentElement.innerHTML
     } else {
-      // use testConent instend of innerText(non-standard),
+      // use textConent instend of innerText(non-standard),
       // see also https://stackoverflow.com/questions/35213147/difference-between-textcontent-vs-innertext
       record.text = target.textContent
     }
@@ -120,7 +123,7 @@ export default class DOMMutationObserverClass extends BasicObserverClass
 
   /**
    * @Either:
-   * when node added or removed,
+   * if node been added or removed,
    * @Or:
    * if a contenteditable textNode's text been all removed, type should be `childList`(remove #text),
    * later if you type/add some text in this empty textNode, the first mutation's type would be `childList`(add #text), fellows by `characterData`s
@@ -149,10 +152,10 @@ export default class DOMMutationObserverClass extends BasicObserverClass
 
     if (!isAdd && !isRemove) return
 
-    // addnodes / removenodes could exist both
+    // add and remove node could happen in the same record
     record.type = DOMMutationTypes.node
 
-    /** Add */
+    // Add element or textNode
     this.nodesFilter(addedNodes).forEach(
       (node): void => {
         let nodeData = {} as NodeMutationData
@@ -181,11 +184,11 @@ export default class DOMMutationObserverClass extends BasicObserverClass
 
             nodeData.index = this.getNodeIndex(parentElement, node)
 
-            RecorderDocument.bufferNewElement(node)
+            NikonD7000.bufferNewElement(node)
 
             nodeData.html = node.outerHTML
 
-            RecorderDocument.unmark(node, true)
+            NikonD7000.unmark(node, true)
           }
         }
 
@@ -195,7 +198,7 @@ export default class DOMMutationObserverClass extends BasicObserverClass
       }
     )
 
-    /** Remove */
+    // Remove element or textNode
     this.nodesFilter(removedNodes).forEach(
       (node): void => {
         let nodeData = {} as NodeMutationData
@@ -205,7 +208,7 @@ export default class DOMMutationObserverClass extends BasicObserverClass
             nodeData.type = 'text'
             const { parentElement } = node
             // 当删除一个 textNode 或 所有文本内容时
-            // when delete a whole textNode
+            // when delete the whole textNode
             if (parentElement) {
               nodeData.index = Array.prototype.slice
                 .call(parentElement.childNodes)

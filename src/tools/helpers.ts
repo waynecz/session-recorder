@@ -1,8 +1,5 @@
-export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
-
-export type Optional<T> = { [key in keyof T]?: T[key] }
-
 export const _log = console.log.bind(null, '[Recorder]:')
+
 export const _warn = console.warn.bind(null, '[Recorder]:')
 
 export function _now(): number {
@@ -84,10 +81,6 @@ export function _recover(source: object, name: string): void {
   source[name] = __recorder_original__
 }
 
-/**
- * 
- * @param href 
- */
 export function _parseURL(
   href: string = location.href
 ): {

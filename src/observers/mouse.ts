@@ -1,26 +1,30 @@
-import { HighOrderObserver } from '../models/observers'
-import { MouseReocrd, MouseTypes } from '../models/observers/event'
-import { MouseObserverOptions, Listener } from '../models/observers/event'
+import {
+  HighOrderObserver,
+  MouseReocrd,
+  MouseTypes,
+  MouseOptions,
+  Listener
+} from '../models'
 import { _throttle, _log } from '../tools/helpers'
 import BasicObserverClass from './index'
-import { RECORDER_OPTIONS } from '../constants'
+import { RECORDER_DEFAULT_OPTIONS } from '../constants'
 
 /**
  * Observe mouse behavior
  * and produce an Record
- **/
+ */
 export default class MouseObserverClass extends BasicObserverClass
   implements HighOrderObserver {
   public name: string = 'MouseObserverClass'
   public listeners: Listener[] = []
-  public options: MouseObserverOptions = RECORDER_OPTIONS.mouse
+  public options: MouseOptions = RECORDER_DEFAULT_OPTIONS.mouse
 
-  public status: MouseObserverOptions = {
+  public status: MouseOptions = {
     click: false,
     mousemove: false
   }
 
-  constructor(options: MouseObserverOptions | boolean) {
+  constructor(options: MouseOptions | boolean) {
     super()
     if (options === false) return
 

@@ -1,9 +1,9 @@
-import { HighOrderObserver } from '../models/observers'
 import { _recover, _log, _parseURL, _replace } from '../tools/helpers'
-import { HistoryRecord, HistoryTypes } from '../models/observers/history'
+import { HighOrderObserver, HistoryRecord, HistoryTypes } from '../models'
 import BasicObserverClass from './index'
 
-export default class HistoryObserverClass extends BasicObserverClass implements HighOrderObserver {
+export default class HistoryObserverClass extends BasicObserverClass
+  implements HighOrderObserver {
   public name: string = 'HistoryObserverClass'
   public status: boolean = false
   private lastHref: string
@@ -14,7 +14,10 @@ export default class HistoryObserverClass extends BasicObserverClass implements 
     if (options === false) return
   }
 
-  private getHistoryRecord(from: string | undefined, to: string | undefined): void {
+  private getHistoryRecord(
+    from: string | undefined,
+    to: string | undefined
+  ): void {
     const parsedHref = _parseURL(location.href)
     const parsedTo = _parseURL(to)
     let parsedFrom = _parseURL(from)

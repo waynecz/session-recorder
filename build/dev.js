@@ -11,7 +11,13 @@ function resolve(dir) {
 
 const devConfig = merge(baseWebpackConfig, {
   mode: 'development',
-  
+
+  context: resolve('example'),
+
+  entry: {
+    index: './index'
+  },
+
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',

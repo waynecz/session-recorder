@@ -15,7 +15,7 @@ export enum HttpEndTypes {
   xhrend = 'xhrend'
 }
 
-export type HttpObserveOptions = {
+export type HttpOptions = {
   beacon?: boolean
   fetch?: boolean
   xhr?: boolean

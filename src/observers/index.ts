@@ -1,40 +1,40 @@
-import { isFunction } from "../tools/is";
-import { BasicObserver } from "../models/observers";
+import { isFunction } from '../tools/is'
+import { BasicObserver } from '../models'
 
 export default class BasicObserverClass implements BasicObserver {
-  public queues: Map<string, Function[]> = new Map();
+  public queues: Map<string, Function[]> = new Map()
 
   public $on = (hook: string, action: Function): void => {
-    const { queues } = this;
-    const existingTasks = queues.get(hook) || [];
+    const { queues } = this
+    const existingTasks = queues.get(hook) || []
 
-    queues.set(hook, [...existingTasks, action]);
+    queues.set(hook, [...existingTasks, action])
   }
 
   public $off = (hook: string, thisAction: Function): void => {
-    const Q = this.queues.get(hook) || [];
+    const Q = this.queues.get(hook) || []
     if (!Q.length) {
-      return;
+      return
     }
 
-    const index = Q.indexOf(thisAction);
+    const index = Q.indexOf(thisAction)
 
     if (index !== -1) {
-      Q.splice(index, 1);
-      this.queues.set(hook, Q);
+      Q.splice(index, 1)
+      this.queues.set(hook, Q)
     }
   }
 
   public $emit = (hook: string, ...args): void => {
-    const Q = this.queues.get(hook) || [];
+    const Q = this.queues.get(hook) || []
     if (!Q.length) {
-      return;
+      return
     }
 
     Q.forEach(action => {
       if (isFunction(action)) {
-        action(...args);
+        action(...args)
       }
-    });
+    })
   }
 }
