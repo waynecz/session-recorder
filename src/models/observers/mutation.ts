@@ -11,7 +11,7 @@ export interface NodeMutationData {
   type: 'text' | 'ele'
   /* target, exist when node been removed */
   target?: number
-  remaining?: string // exist when textNode been removed
+  textContent?: string // exist when textNode been removed
   /* index and html here only when it was an add operation */
 
   html?: string // addnode's html or text

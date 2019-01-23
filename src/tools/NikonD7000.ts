@@ -27,7 +27,7 @@ class NikonD7000DSLRClass implements D7000 {
 
     this.latestSnapshot = document.documentElement.outerHTML
 
-    // remove id from node
+    // remove recorder-id from node
     Array.prototype.slice
       .call(document.querySelectorAll('*'))
       .forEach((node: HTMLElement) => {

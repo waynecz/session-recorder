@@ -113,7 +113,7 @@ export default class DOMMutationObserverClass extends BasicObserverClass
       record.target = parentEle
       record.html = target.parentElement.innerHTML
     } else {
-      // use textConent instend of innerText(non-standard),
+      // use textContent instend of innerText(non-standard),
       // see also https://stackoverflow.com/questions/35213147/difference-between-textcontent-vs-innertext
       record.text = target.textContent
     }
@@ -210,11 +210,18 @@ export default class DOMMutationObserverClass extends BasicObserverClass
             // 当删除一个 textNode 或 所有文本内容时
             // when delete the whole textNode
             if (parentElement) {
+              nodeData.html = node.textContent
               nodeData.index = Array.prototype.slice
                 .call(parentElement.childNodes)
                 .indexOf(node)
             } else {
-              nodeData.remaining = target.innerHTML
+              // 在没有 parentElement 的情况下我们无法获取到这个 textNode 节点的 index
+              // 这时我们只能记录下它的 textContent 然后通过前后元素来辅助定位，这个步骤在播放器里进行
+              // on this occasion, we have no parentElement help us find
+              // the index of node which was been removed,
+              // we could only record the textContent and use previousSibling and nextSibling
+              // for locating this node's index!   eg.[...prev, ->node<-, next...]
+              nodeData.textContent = node.textContent
             }
             break
           }
