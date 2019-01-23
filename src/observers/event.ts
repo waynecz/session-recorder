@@ -10,7 +10,7 @@ import {
 import { _throttle, _log } from '../tools/helpers'
 import RecorderDocument from '../tools/NikonD7000'
 import BasicObserverClass from './index'
-import { RECORDER_DEFAULT_OPTIONS } from '../constants'
+import { OBSERVER_DEFAULT_OPTIONS } from '../constants'
 
 const { getRecordIdByElement } = RecorderDocument
 
@@ -22,8 +22,8 @@ export default class EventObserverClass extends BasicObserverClass
   implements HighOrderObserver {
   public name: string = 'EventObserverClass'
   public listeners: Listener[] = []
-  public options: EventOptions = RECORDER_DEFAULT_OPTIONS.event
-  public status: EventOptions = RECORDER_DEFAULT_OPTIONS.event
+  public options: EventOptions = OBSERVER_DEFAULT_OPTIONS.event
+  public status: EventOptions = OBSERVER_DEFAULT_OPTIONS.event
 
   constructor(options: EventOptions | boolean) {
     super()

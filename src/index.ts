@@ -7,7 +7,7 @@ import {
   ElementX
 } from './models/index'
 import { _log, _warn, _now, _throttle } from './tools/helpers'
-import { RECORDER_DEFAULT_OPTIONS } from './constants'
+import { RECORDER_PRESET } from './constants'
 
 import ConsoleObserverClass from './observers/console'
 import EventObserverClass from './observers/event'
@@ -29,12 +29,11 @@ export default class RecorderClass implements Recorder {
     history: null,
     http: null
   }
-  public options: RecorderPreset = RECORDER_DEFAULT_OPTIONS
+  public options: RecorderPreset = RECORDER_PRESET
   public trail: any[] = []
   public recording: boolean = false
   private baseTime: number = 0
 
-  public maxTimeSpan: number = 60000 // limit time of recording
   private lastSnapshot: { time: number; index: number } = {
     time: 0,
     index: 0
@@ -94,7 +93,7 @@ export default class RecorderClass implements Recorder {
       index: lastSnapshotIndex
     } = this.lastSnapshot
 
-    if (thisRecordTime - lastSnapshotTime >= this.maxTimeSpan / 2) {
+    if (thisRecordTime - lastSnapshotTime >= this.options.maxTimeSpan / 2) {
       if (lastSnapshotIndex !== 0) {
         this.trail = this.trail.slice(lastSnapshotIndex)
       }

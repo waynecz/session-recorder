@@ -50,17 +50,16 @@ export interface Recorder {
   observers: Observers
   options: RecorderPreset
   recording: boolean
-  maxTimeSpan: number
 
   start: () => void
   stop: () => void
 }
 
 export type RecorderPreset = {
-  [key in keyof RecorderOptions]: RecorderOptions[key] | boolean
-}
+  [key in keyof ObserverOptions]: ObserverOptions[key] | boolean
+} & { maxTimeSpan: number }
 
-export type RecorderOptions = {
+export type ObserverOptions = {
   console?: ConsoleOptions
   event?: EventOptions
   mouse?: MouseOptions

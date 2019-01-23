@@ -7,7 +7,7 @@ import {
 } from '../models/index'
 import { _replace, _recover, _log } from '../tools/helpers'
 import BasicObserverClass from './index'
-import { RECORDER_DEFAULT_OPTIONS } from '../constants'
+import { OBSERVER_DEFAULT_OPTIONS } from '../constants'
 
 export default class ConsoleObserverClass extends BasicObserverClass
   implements HighOrderObserver {
@@ -20,7 +20,7 @@ export default class ConsoleObserverClass extends BasicObserverClass
     warn: true,
     debug: false
   }
-  public status = RECORDER_DEFAULT_OPTIONS.console
+  public status = OBSERVER_DEFAULT_OPTIONS.console
 
   constructor(options: ConsoleOptions | boolean) {
     super()

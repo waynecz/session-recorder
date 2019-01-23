@@ -46,6 +46,8 @@ myReocrder.end() // stop record
 
 - [ ] VDOM
 - [ ] Using WebWorker store trail data
+- [ ] Input's default value
+- [ ] Unbubble click
 
 <br>
 

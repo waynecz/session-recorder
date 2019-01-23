@@ -8,13 +8,13 @@ import {
 import { _replace, _recover, _newuuid, _log } from '../tools/helpers'
 import { isFunction } from '../tools/is'
 import BasicObserverClass from './index'
-import { RECORDER_DEFAULT_OPTIONS } from '../constants'
+import { OBSERVER_DEFAULT_OPTIONS } from '../constants'
 
 export default class HttpObserverClass extends BasicObserverClass
   implements HighOrderObserver {
   public name: string = 'HttpObserverClass'
   public active: boolean
-  public options: HttpOptions = RECORDER_DEFAULT_OPTIONS.http
+  public options: HttpOptions = OBSERVER_DEFAULT_OPTIONS.http
   public status: HttpOptions = {
     beacon: false,
     fetch: false,

@@ -7,7 +7,7 @@ import {
 } from '../models/index'
 import { _throttle, _log } from '../tools/helpers'
 import BasicObserverClass from './index'
-import { RECORDER_DEFAULT_OPTIONS } from '../constants'
+import { OBSERVER_DEFAULT_OPTIONS } from '../constants'
 
 /**
  * Observe mouse behavior
@@ -17,7 +17,7 @@ export default class MouseObserverClass extends BasicObserverClass
   implements HighOrderObserver {
   public name: string = 'MouseObserverClass'
   public listeners: Listener[] = []
-  public options: MouseOptions = RECORDER_DEFAULT_OPTIONS.mouse
+  public options: MouseOptions = OBSERVER_DEFAULT_OPTIONS.mouse
 
   public status: MouseOptions = {
     click: false,

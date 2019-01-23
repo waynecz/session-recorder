@@ -6,13 +6,13 @@ import {
 } from '../models/index'
 import { _replace, _log, _recover } from '../tools/helpers'
 import BasicObserverClass from './index'
-import { RECORDER_DEFAULT_OPTIONS } from '../constants'
+import { OBSERVER_DEFAULT_OPTIONS } from '../constants'
 
 // TODO: error stack trace compution
 export default class JSErrorObserverClass extends BasicObserverClass
   implements HighOrderObserver {
   public name: string = 'JSErrorObserverClass'
-  public options: ErrorOptions = RECORDER_DEFAULT_OPTIONS.error
+  public options: ErrorOptions = OBSERVER_DEFAULT_OPTIONS.error
 
   public status: ErrorOptions = {
     jserror: false,
