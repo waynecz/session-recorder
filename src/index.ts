@@ -107,7 +107,7 @@ export default class RecorderClass implements Recorder {
   }
 
   private getSnapshotRecord() {
-    this.lastSnapshot.time = _now() - this.baseTime
+    this.lastSnapshot.time = _now() - (this.baseTime || _now())
     this.lastSnapshot.index = this.trail.length
 
     const { clientWidth: w, clientHeight: h } = document.documentElement
@@ -133,9 +133,9 @@ export default class RecorderClass implements Recorder {
 
     this.recording = true
 
-    this.trail[0] = this.getSnapshotRecord()
-
     this.baseTime = _now()
+    // note the getSnapshotRecord method depend on baseTime
+    this.trail[0] = this.getSnapshotRecord()
 
     Object.keys(this.observers).forEach(observerName => {
       if (this.options[observerName]) {

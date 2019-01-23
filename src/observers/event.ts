@@ -138,24 +138,13 @@ export default class EventObserverClass extends BasicObserverClass
   public install(): void {
     const { addListener } = this
 
-    const { scroll, resize, form, domsWillScroll } = this.options
+    const { scroll, resize, form } = this.options
 
     if (scroll) {
-      if (Array.isArray(domsWillScroll)) {
-        domsWillScroll.forEach(selector => {
-          addListener({
-            target: document.querySelector(selector),
-            event: 'scroll',
-            callback: _throttle(this.getScrollRecord),
-            options: true
-          })
-        })
-      }
-
       addListener({
         target: document,
         event: 'scroll',
-        callback: _throttle(this.getScrollRecord, 80),
+        callback: this.getScrollRecord,
         options: true
       })
       this.status.scroll = true
