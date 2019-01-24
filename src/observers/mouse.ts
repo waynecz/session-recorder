@@ -82,7 +82,7 @@ export default class MouseObserverClass extends BasicObserverClass
       addListener({
         target: document,
         event: 'mousemove',
-        callback: _throttle(this.getMouseMoveRecord, 500)
+        callback: _throttle(this.getMouseMoveRecord, 100)
       })
 
       this.status.mousemove = true

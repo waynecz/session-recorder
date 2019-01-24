@@ -32,9 +32,9 @@ See also [Session-Player(developing)](https://github.com/waynecz/session-player)
 ### Code intergration:
 
 ```javascript
-import Recorder from '@wayne/session-recorder'
+import SessionRecorder from '@wayne/session-recorder'
 
-const myReocrder = new Recorder()
+const myReocrder = new SessionRecorder()
 
 myReocrder.start() // make sure start after DOMContentLoaded
 myReocrder.end() // stop record

@@ -30,11 +30,14 @@ export default class BasicObserverClass implements BasicObserver {
     if (!Q.length) {
       return
     }
-
-    Q.forEach(action => {
-      if (isFunction(action)) {
-        action(...args)
-      }
-    })
+    try {
+      Q.forEach(action => {
+        if (isFunction(action)) {
+          action(...args)
+        }
+      })
+    } catch (error) {
+      console.error(error)
+    }
   }
 }

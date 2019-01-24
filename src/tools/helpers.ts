@@ -1,5 +1,5 @@
 export const _log = console.log.bind(null, '[Recorder]:')
-
+export const _error = console.error.bind(null, '[Recorder]:')
 export const _warn = console.warn.bind(null, '[Recorder]:')
 
 export function _now(): number {

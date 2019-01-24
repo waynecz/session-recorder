@@ -7,7 +7,7 @@ import {
 } from '../models/index'
 import { ID_KEY } from '../constants'
 import NikonD7000 from '../tools/NikonD7000'
-import { _log } from '../tools/helpers'
+import { _log, _warn } from '../tools/helpers'
 import BasicObserverClass from './index'
 
 const { getRecordIdByElement } = NikonD7000
@@ -31,30 +31,34 @@ export default class DOMMutationObserverClass extends BasicObserverClass
   }
 
   private process(mutationRecord: MutationRecordX) {
-    const { target, attributeName } = mutationRecord
+    try {
+      const { target, attributeName } = mutationRecord
 
-    // ignore script tag's mutation
-    if (target && target.tagName === 'SCRIPT') return
+      // ignore script tag's mutation
+      if (target && target.tagName === 'SCRIPT') return
 
-    switch (mutationRecord.type) {
-      case 'attributes': {
-        // ignore recorderId mutate
-        if (attributeName === ID_KEY) return
+      switch (mutationRecord.type) {
+        case 'attributes': {
+          // ignore recorderId mutate
+          if (attributeName === ID_KEY) return
 
-        return this.getAttrReocrd(mutationRecord)
+          return this.getAttrReocrd(mutationRecord)
+        }
+
+        case 'characterData': {
+          return this.getTextRecord(mutationRecord)
+        }
+
+        case 'childList': {
+          return this.getNodesRecord(mutationRecord)
+        }
+
+        default: {
+          return
+        }
       }
-
-      case 'characterData': {
-        return this.getTextRecord(mutationRecord)
-      }
-
-      case 'childList': {
-        return this.getNodesRecord(mutationRecord)
-      }
-
-      default: {
-        return
-      }
+    } catch (error) {
+      _warn(error)
     }
   }
 
