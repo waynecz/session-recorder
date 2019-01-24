@@ -2,7 +2,7 @@ import { ConsoleOptions } from './observers/console'
 import { EventOptions, MouseOptions } from './observers/event'
 import { HttpOptions } from './observers/http'
 import { ErrorOptions } from './observers/error'
-import { BasicObserver } from './observers'
+import { BasicObserver } from './observers/index'
 
 export type ElementX = HTMLElement | Element
 

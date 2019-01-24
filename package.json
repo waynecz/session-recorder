@@ -1,6 +1,6 @@
 {
   "name": "@waynecz/session-recorder",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Record user interactions/js error/network/console in web",
   "main": "dist/index.js",
   "typings": "./dist/index.d.ts",
@@ -9,7 +9,7 @@
     "dev": "npx webpack-dev-server --inline --config build/dev.js",
     "prebuild": "npm run lint && rimraf dist",
     "commit": "npx git-cz",
-    "build": "rm -rf dist && npx tsc",
+    "build": "npx tsc",
     "release": "npm run build && git add .&& npx release-it"
   },
   "repository": {
