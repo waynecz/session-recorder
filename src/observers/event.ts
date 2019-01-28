@@ -171,7 +171,7 @@ export default class EventObserverClass extends BasicObserverClass
       addListener({
         target: document,
         event: 'input',
-        callback: _throttle(this.getFormChangeRecord),
+        callback: _throttle(this.getFormChangeRecord, 300),
         options: true
       })
       this.status.form = true

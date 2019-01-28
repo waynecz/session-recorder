@@ -1,6 +1,8 @@
 # Session Recorder
 
-See also [Session-Player(developing)](https://github.com/waynecz/session-player) for consuming Recorder's data
+> Imagine that a video camera continuously record the whole page
+
+See also [Session-Player(developing)](https://github.com/waynecz/session-player) consuming Recorder's data
 
 ### Record list:
 
