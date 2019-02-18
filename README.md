@@ -15,7 +15,7 @@ See also [Session-Player(developing)](https://github.com/waynecz/session-player)
 ### Output like:
 
 ```json
-[ 
+[
   {"t": 0, "type": "snapshot", "snapshot": "#document snapshot", "scroll": ... },
   { "t": 1, "type": "node", "add": [{ "html": "<div id>textContent</div>" }], "target": 6 },
   { "t": 2, "type": "form", "target": 16, "k": "value", "v": "2312" },
@@ -48,7 +48,6 @@ myReocrder.end() // stop record
 
 - [ ] VDOM
 - [ ] Using WebWorker store trail data
-- [ ] Input's default value
 - [ ] Unbubble click
 
 <br>
