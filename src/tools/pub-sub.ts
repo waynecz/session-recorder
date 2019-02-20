@@ -1,5 +1,5 @@
 import { isFunction } from './is'
-import { PubSubPattern } from 'models/observers'
+import { PubSubPattern } from '../models/observers'
 
 export default class EventDrivenable implements PubSubPattern {
   public queues: Map<string, Function[]> = new Map()
