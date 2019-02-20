@@ -12,16 +12,27 @@
       ul {
         height: 200px;
         overflow: scroll;
+        line-height: 2;
       }
     </style>
+
+    <script>
+      const promise = async () => {
+        return Promise.reject('dsadad')
+      }
+      window.unhandleReject = () => {
+        console.log('reject')
+        promise().then(console.log)
+      }
+    </script>
   </head>
 
   <body>
     <ul>
-      <li>content 1</li>
-      <li>content 2</li>
-      <li>content 3</li>
-      <li>content 4</li>
+      <li onclick="console.log(widn.xxx.xxxx)">simple error</li>
+      <li onclick="window.unhandleReject()">simple rejection</li>
+      <li id="errClick">error in other file</li>
+      <li id="rejectClick">rejection in other file</li>
       <li>content 5</li>
       <li>content 6</li>
       <li>content 6</li>

@@ -103,7 +103,8 @@ export default class JSErrorObserverClass extends BasicObserverClass
       url,
       line: `${lineno}:${colno}`,
       msg,
-      err
+      err,
+      stack: err.stack
     }
 
     const { $emit } = this
@@ -114,15 +115,12 @@ export default class JSErrorObserverClass extends BasicObserverClass
   private getUnhandlerejectionRecord = (
     errevt: PromiseRejectionEvent
   ): void => {
-    let _errevt = { ...errevt }
-
-    if (!_errevt) {
-      _errevt.reason = 'undefined'
-    }
+    const reason = errevt.reason || ''
 
     const record: ErrorRecord = {
       type: ErrorTypes.unhandledrejection,
-      msg: _errevt.reason
+      msg: reason,
+      stack: reason.stack
     }
 
     const { $emit } = this
