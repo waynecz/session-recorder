@@ -1,42 +1,28 @@
-import {
-  HighOrderObserver,
-  MouseReocrd,
-  MouseTypes,
-  MouseOptions,
-  Listener
-} from '../models/index'
+import { MouseReocrd, MouseTypes, Observer, Listener } from '../models/observers'
 import { _throttle, _log } from '../tools/helpers'
-import BasicObserverClass from './index'
-import { OBSERVER_DEFAULT_OPTIONS } from '../constants'
+import { RECORDER_PRESET } from '../constants'
+import EventDrivenable from '../tools/pub-sub'
 
 /**
  * Observe mouse behavior
  * and produce an Record
  */
-export default class MouseObserverClass extends BasicObserverClass
-  implements HighOrderObserver {
-  public name: string = 'MouseObserverClass'
+export default class MouseObserver extends EventDrivenable implements Observer {
   public listeners: Listener[] = []
-  public options: MouseOptions = OBSERVER_DEFAULT_OPTIONS.mouse
+  public options = RECORDER_PRESET.mouse
 
-  public status: MouseOptions = {
-    click: false,
-    mousemove: false
-  }
-
-  constructor(options: MouseOptions | boolean) {
+  constructor(options?: any) {
     super()
-    if (options === false) return
+    if (typeof options === 'boolean' && options === false) {
+      return
+    }
 
     if (typeof options === 'object') {
       this.options = { ...this.options, ...options }
     }
   }
 
-  private addListener = (
-    { target, event, callback, options = false }: Listener,
-    cb?: () => void
-  ) => {
+  private addListener = ({ target, event, callback, options = false }: Listener, cb?: () => void) => {
     target.addEventListener(event, callback, options)
 
     this.listeners.push({
@@ -75,17 +61,14 @@ export default class MouseObserverClass extends BasicObserverClass
         event: 'click',
         callback: this.getMouseClickRecord
       })
-      this.status.click = true
     }
 
     if (mousemove) {
       addListener({
         target: document,
         event: 'mousemove',
-        callback: _throttle(this.getMouseMoveRecord, 100)
+        callback: _throttle(this.getMouseMoveRecord, 50)
       })
-
-      this.status.mousemove = true
     }
 
     _log('mouse observer ready!')
@@ -94,8 +77,6 @@ export default class MouseObserverClass extends BasicObserverClass
   public uninstall() {
     this.listeners.forEach(({ target, event, callback }) => {
       target.removeEventListener(event, callback)
-
-      this.status[event] = false
     })
   }
 }

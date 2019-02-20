@@ -1,32 +1,22 @@
-import {
-  HighOrderObserver,
-  HttpOptions,
-  HttpRockets,
-  HttpRecord,
-  RecorderWrappedXMLHttpRequest
-} from '../models/index'
+import { RecorderWrappedXMLHttpRequest } from '../models/index'
 import { _replace, _recover, _newuuid, _log } from '../tools/helpers'
 import { isFunction } from '../tools/is'
-import BasicObserverClass from './index'
-import { OBSERVER_DEFAULT_OPTIONS } from '../constants'
+import { RECORDER_PRESET } from '../constants'
+import EventDrivenable from '../tools/pub-sub'
+import { Observer, HttpOptions, HttpRockets, HttpRecord } from '../models/observers'
 
-export default class HttpObserverClass extends BasicObserverClass
-  implements HighOrderObserver {
-  public name: string = 'HttpObserverClass'
+export default class HttpObserver extends EventDrivenable implements Observer {
   public active: boolean
-  public options: HttpOptions = OBSERVER_DEFAULT_OPTIONS.http
-  public status: HttpOptions = {
-    beacon: false,
-    fetch: false,
-    xhr: false
-  }
+  public options: HttpOptions = RECORDER_PRESET.http
 
   private xhrRecordMap: Map<string, HttpRecord> = new Map()
 
-  constructor(options: HttpOptions | boolean) {
+  constructor(options?: any) {
     super()
 
-    if (options === false) return
+    if (typeof options === 'boolean' && options === false) {
+      return
+    }
 
     if (typeof options === 'object') {
       this.options = { ...this.options, ...options }
@@ -74,8 +64,6 @@ export default class HttpObserverClass extends BasicObserverClass
 
     function fetchReplacement(originalFetch) {
       return function(input: string | Request, config?: Request): void {
-        const requestId = _newuuid()
-
         let _method = 'GET'
         let _url: string
 
@@ -97,7 +85,6 @@ export default class HttpObserverClass extends BasicObserverClass
           type: HttpRockets.fetch,
           method: _method,
           url: _url,
-          id: requestId,
           input: [...arguments]
         } as HttpRecord
 
@@ -142,7 +129,6 @@ export default class HttpObserverClass extends BasicObserverClass
 
         let record = {
           type: HttpRockets.xhr,
-          id: requestId,
           url,
           method,
           headers: {}
@@ -157,11 +143,7 @@ export default class HttpObserverClass extends BasicObserverClass
     }
 
     function XHRSetRequestHeaderReplacement(originalSetter) {
-      return function(
-        this: RecorderWrappedXMLHttpRequest,
-        key: string,
-        value: any
-      ) {
+      return function(this: RecorderWrappedXMLHttpRequest, key: string, value: any) {
         const requestId = this.__id__
         const record = self.xhrRecordMap.get(requestId)
 
@@ -202,10 +184,7 @@ export default class HttpObserverClass extends BasicObserverClass
 
         // TODO: hijack xhr.onerror, xhr.onabort, xhr.ontimeout
 
-        if (
-          'onreadystatechange' in thisXHR &&
-          isFunction(thisXHR.onreadystatechange)
-        ) {
+        if ('onreadystatechange' in thisXHR && isFunction(thisXHR.onreadystatechange)) {
           // if already had a hook
           _replace(thisXHR, 'onreadystatechange', originalStateChangeHook => {
             return (...args) => {
@@ -246,17 +225,14 @@ export default class HttpObserverClass extends BasicObserverClass
 
     if (beacon) {
       this.hijackBeacon()
-      this.status.beacon = true
     }
 
     if (fetch) {
       this.hijackFetch()
-      this.status.fetch = true
     }
 
     if (xhr) {
       this.hijackXHR()
-      this.status.xhr = true
     }
 
     _log('http observer ready!')
@@ -267,17 +243,14 @@ export default class HttpObserverClass extends BasicObserverClass
 
     if (beacon) {
       _recover(window.navigator, 'sendBeacon')
-      this.status.beacon = false
     }
 
     if (fetch) {
       _recover(window, 'fetch')
-      this.status.fetch = false
     }
 
     if (xhr) {
       this.hijackBeacon()
-      this.status.xhr = false
     }
   }
 }

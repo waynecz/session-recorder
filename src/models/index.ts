@@ -1,8 +1,4 @@
-import { ConsoleOptions } from './observers/console'
-import { EventOptions, MouseOptions } from './observers/event'
-import { HttpOptions } from './observers/http'
-import { ErrorOptions } from './observers/error'
-import { BasicObserver } from './observers/index'
+import { Observer } from './observers'
 
 export type ElementX = HTMLElement | Element
 
@@ -33,47 +29,25 @@ export interface RecorderWrappedXMLHttpRequest extends XMLHttpRequest {
   __skip_record__?: boolean
 }
 
-export type ObserverName =
-  | 'mutation'
-  | 'console'
-  | 'event'
-  | 'mouse'
-  | 'error'
-  | 'history'
-  | 'http'
+export type ObserverName = 'mutation' | 'console' | 'event' | 'mouse' | 'error' | 'history' | 'http'
 
-export type Observers = { [key in ObserverName]: BasicObserver }
+export type Observers = { [key in ObserverName]: Observer }
 
 export interface Recorder {
-  NikonD7000?: D7000
+  SonyA7R3?: SonyA7R3
   trail: any[]
   observers: Observers
-  options: RecorderPreset
+  options: any
   recording: boolean
 
   start: () => void
   stop: () => void
 }
 
-export type RecorderPreset = {
-  [key in keyof ObserverOptions]: ObserverOptions[key] | boolean
-} & { maxTimeSpan: number }
-
-export type ObserverOptions = {
-  console?: ConsoleOptions
-  event?: EventOptions
-  mouse?: MouseOptions
-  http?: HttpOptions
-  error?: ErrorOptions
-  history?: boolean
-  mutation?: boolean
-}
-
-export interface D7000 {
-  latestSnapshot: string
+export interface SonyA7R3 {
   inited: boolean
+
+  latestSnapshot: string
 
   takeSnapshotForPage(): void
 }
-
-export * from './observers/index'

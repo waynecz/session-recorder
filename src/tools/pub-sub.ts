@@ -1,7 +1,7 @@
-import { isFunction } from '../tools/is'
-import { BasicObserver } from '../models/index'
+import { isFunction } from './is'
+import { PubSubPattern } from 'models/observers'
 
-export default class BasicObserverClass implements BasicObserver {
+export default class EventDrivenable implements PubSubPattern {
   public queues: Map<string, Function[]> = new Map()
 
   public $on = (hook: string, action: Function): void => {

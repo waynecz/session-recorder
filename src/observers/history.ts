@@ -1,10 +1,8 @@
 import { _recover, _log, _parseURL, _replace } from '../tools/helpers'
-import { HighOrderObserver, HistoryRecord, HistoryTypes } from '../models/index'
-import BasicObserverClass from './index'
+import EventDrivenable from '../tools/pub-sub'
+import { Observer, HistoryRecord, HistoryTypes } from '../models/observers'
 
-export default class HistoryObserverClass extends BasicObserverClass
-  implements HighOrderObserver {
-  public name: string = 'HistoryObserverClass'
+export default class HistoryObserver extends EventDrivenable implements Observer {
   public status: boolean = false
   private lastHref: string
 
@@ -14,10 +12,7 @@ export default class HistoryObserverClass extends BasicObserverClass
     if (options === false) return
   }
 
-  private getHistoryRecord(
-    from: string | undefined,
-    to: string | undefined
-  ): void {
+  private getHistoryRecord(from: string | undefined, to: string | undefined): void {
     const parsedHref = _parseURL(location.href)
     const parsedTo = _parseURL(to)
     let parsedFrom = _parseURL(from)
@@ -41,11 +36,7 @@ export default class HistoryObserverClass extends BasicObserverClass
   }
 
   private isSupportHistory(): boolean {
-    return (
-      'history' in window &&
-      !!window.history.pushState &&
-      !!window.history.replaceState
-    )
+    return 'history' in window && !!window.history.pushState && !!window.history.replaceState
   }
 
   public install(): void {

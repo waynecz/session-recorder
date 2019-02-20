@@ -1,17 +1,14 @@
-import { ID_KEY } from '../constants'
-import { ElementX, D7000 } from '../models'
+import { RECORDER_ID } from '../constants'
+import { ElementX, SonyA7R3 } from '../models'
 
 /**
- * Nikon D7000 DSLR is a camera with abilities list below:
+ * SonyA7R3 is a camera with abilities list below:
  * @feature take snapshot for page
  * @feature buffer every node in document up in Map<node, id> format
  * @feature mark / unmark node with unique ID
  */
-class NikonD7000DSLRClass implements D7000 {
-  public map: Map<
-    HTMLElement | Element | Node | EventTarget,
-    number
-  > = new Map()
+class SonyA7R3Camera implements SonyA7R3 {
+  public map: Map<HTMLElement | Element | Node | EventTarget, number> = new Map()
   public latestSnapshot: string
   public inited: boolean = false
   private id: number = 0 // self-increase id
@@ -21,18 +18,14 @@ class NikonD7000DSLRClass implements D7000 {
 
     // Buffer every element into the Map
     // Note that textNodes wouldn't been included !!
-    Array.prototype.slice
-      .call(document.querySelectorAll('*'))
-      .forEach(this.buffer)
+    Array.prototype.slice.call(document.querySelectorAll('*')).forEach(this.buffer)
 
     this.latestSnapshot = document.documentElement.outerHTML
 
     // remove recorder-id from node
-    Array.prototype.slice
-      .call(document.querySelectorAll('*'))
-      .forEach((node: HTMLElement) => {
-        this.unmark(node)
-      })
+    Array.prototype.slice.call(document.querySelectorAll('*')).forEach((node: HTMLElement) => {
+      this.unmark(node)
+    })
 
     console.timeEnd('[Snapshot for page]')
 
@@ -46,18 +39,16 @@ class NikonD7000DSLRClass implements D7000 {
 
   // mark recorderId on non-textnode
   public mark(ele: ElementX, id): void {
-    ele.setAttribute(ID_KEY, id)
+    ele.setAttribute(RECORDER_ID, id)
   }
 
   // remove recorderId on non-textnode
   public unmark(ele: ElementX, isDeep: boolean = false): void {
     const { removeAttribute } = ele
-    removeAttribute && ele.removeAttribute(ID_KEY)
+    removeAttribute && ele.removeAttribute(RECORDER_ID)
 
     if (isDeep && ele.childElementCount) {
-      Array.prototype.slice
-        .call(ele.children)
-        .forEach(chEle => this.unmark(chEle))
+      Array.prototype.slice.call(ele.children).forEach(chEle => this.unmark(chEle))
     }
   }
 
@@ -75,20 +66,16 @@ class NikonD7000DSLRClass implements D7000 {
 
     if (ele.childElementCount) {
       // element.children retun childElements without textNodes
-      Array.prototype.slice
-        .call(ele.children)
-        .forEach(chEle => this.bufferNewElement(chEle))
+      Array.prototype.slice.call(ele.children).forEach(chEle => this.bufferNewElement(chEle))
     }
   }
 
   // get recorderId from map by element
-  public getRecordIdByElement = (
-    ele: ElementX | EventTarget
-  ): number | undefined => {
+  public getRecordIdByElement = (ele: ElementX | EventTarget): number | undefined => {
     return this.map.get(ele)
   }
 }
 
-const NikonD7000 = new NikonD7000DSLRClass()
+const SonyA7R3 = new SonyA7R3Camera()
 
-export default NikonD7000
+export default SonyA7R3

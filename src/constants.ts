@@ -1,8 +1,6 @@
-import { ObserverOptions, RecorderPreset } from './models'
+export const RECORDER_ID: string = 'recorder-id'
 
-export const ID_KEY: string = 'recorder-id'
-
-export const OBSERVER_DEFAULT_OPTIONS: ObserverOptions = {
+export const RECORDER_PRESET = {
   mutation: true,
   history: true,
   error: {
@@ -29,10 +27,7 @@ export const OBSERVER_DEFAULT_OPTIONS: ObserverOptions = {
   mouse: {
     click: true,
     mousemove: false
-  }
-}
+  },
 
-export const RECORDER_PRESET: RecorderPreset = {
-  ...OBSERVER_DEFAULT_OPTIONS,
   maxTimeSpan: 120000 // max time span of trail
 }

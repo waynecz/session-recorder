@@ -1,29 +1,17 @@
-import {
-  HighOrderObserver,
-  ErrorOptions,
-  ErrorRecord,
-  ErrorTypes
-} from '../models/index'
 import { _replace, _log, _recover } from '../tools/helpers'
-import BasicObserverClass from './index'
-import { OBSERVER_DEFAULT_OPTIONS } from '../constants'
+import { RECORDER_PRESET } from '../constants'
+import EventDrivenable from '../tools/pub-sub'
+import { Observer, ErrorOptions, ErrorRecord, ErrorTypes } from '../models/observers'
 
-// TODO: error stack trace compution
-export default class JSErrorObserverClass extends BasicObserverClass
-  implements HighOrderObserver {
-  public name: string = 'JSErrorObserverClass'
-  public options: ErrorOptions = OBSERVER_DEFAULT_OPTIONS.error
+export default class ErrorObserver extends EventDrivenable implements Observer {
+  public options: ErrorOptions = RECORDER_PRESET.error
 
-  public status: ErrorOptions = {
-    jserror: false,
-    unhandledrejection: false
-  }
-  public active: boolean
-
-  constructor(options: ErrorOptions | boolean) {
+  constructor(options?: any) {
     super()
 
-    if (options === false) return
+    if (typeof options === 'boolean' && options === false) {
+      return
+    }
 
     if (typeof options === 'object') {
       this.options = { ...this.options, ...options }
@@ -78,22 +66,15 @@ export default class JSErrorObserverClass extends BasicObserverClass
   private installUnhanldledrejectionHandler(): void {
     const { getUnhandlerejectionRecord } = this
 
-    _replace(
-      window,
-      'onunhandledrejection',
-      originalUnhanldledrejectionHandler => {
-        // more: https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onunhandledrejection
-        return function(
-          this: PromiseRejectionEvent,
-          errevt: PromiseRejectionEvent
-        ) {
-          getUnhandlerejectionRecord(errevt)
-          if (originalUnhanldledrejectionHandler) {
-            originalUnhanldledrejectionHandler.call(this, errevt)
-          }
+    _replace(window, 'onunhandledrejection', originalUnhanldledrejectionHandler => {
+      // more: https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onunhandledrejection
+      return function(this: PromiseRejectionEvent, errevt: PromiseRejectionEvent) {
+        getUnhandlerejectionRecord(errevt)
+        if (originalUnhanldledrejectionHandler) {
+          originalUnhanldledrejectionHandler.call(this, errevt)
         }
       }
-    )
+    })
   }
 
   private getGlobalerrorReocrd = (errevt: ErrorEvent): void => {
@@ -112,9 +93,7 @@ export default class JSErrorObserverClass extends BasicObserverClass
     $emit('observed', record, errevt)
   }
 
-  private getUnhandlerejectionRecord = (
-    errevt: PromiseRejectionEvent
-  ): void => {
+  private getUnhandlerejectionRecord = (errevt: PromiseRejectionEvent): void => {
     const reason = errevt.reason || ''
 
     const record: ErrorRecord = {
@@ -132,7 +111,6 @@ export default class JSErrorObserverClass extends BasicObserverClass
     const { jserror, unhandledrejection } = this.options
     if (jserror) {
       this.installGlobalerrorHandler()
-      this.status.jserror = true
 
       // TODO: protect recorder's onerror hook by defineProperty
       Object.defineProperty(window, 'onerror', {
@@ -146,7 +124,6 @@ export default class JSErrorObserverClass extends BasicObserverClass
 
     if (unhandledrejection) {
       this.installUnhanldledrejectionHandler()
-      this.status.unhandledrejection = true
     }
 
     _log('error observer ready!')
@@ -157,12 +134,10 @@ export default class JSErrorObserverClass extends BasicObserverClass
 
     if (jserror) {
       _recover(window, 'onerror')
-      this.status.jserror = false
     }
 
     if (unhandledrejection) {
       _recover(window, 'onunhandledrejection')
-      this.status.unhandledrejection = false
     }
   }
 }

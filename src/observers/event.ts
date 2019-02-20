@@ -1,34 +1,26 @@
-import {
-  HighOrderObserver,
-  EventOptions,
-  Listener,
-  EventReocrd,
-  EventTypes,
-  ElementX,
-  FormELement
-} from '../models/index'
+import { ElementX, FormELement } from '../models/index'
 import { _throttle, _log } from '../tools/helpers'
-import RecorderDocument from '../tools/NikonD7000'
-import BasicObserverClass from './index'
-import { OBSERVER_DEFAULT_OPTIONS } from '../constants'
+import SonyA7R3 from '../tools/SonyA7R3'
+import { RECORDER_PRESET } from '../constants'
+import { Observer, EventReocrd, Listener, EventTypes } from '../models/observers'
+import EventDrivenable from '../tools/pub-sub'
 
-const { getRecordIdByElement } = RecorderDocument
+const { getRecordIdByElement } = SonyA7R3
 
 /**
  * Observe scroll, window resize, form field value change(input/textarea/radio etc.)
  * and produce an Record
  */
-export default class EventObserverClass extends BasicObserverClass
-  implements HighOrderObserver {
-  public name: string = 'EventObserverClass'
+export default class EventObserver extends EventDrivenable implements Observer {
   public listeners: Listener[] = []
-  public options: EventOptions = OBSERVER_DEFAULT_OPTIONS.event
-  public status: EventOptions = OBSERVER_DEFAULT_OPTIONS.event
 
-  constructor(options: EventOptions | boolean) {
+  public options = RECORDER_PRESET.event
+
+  constructor(options?: any) {
     super()
-
-    if (options === false) return
+    if (typeof options === 'boolean' && options === false) {
+      return
+    }
 
     if (typeof options === 'object') {
       this.options = { ...this.options, ...options }
@@ -38,10 +30,7 @@ export default class EventObserverClass extends BasicObserverClass
   /**
    * @param option useCapture or AddEventListenerOptions
    */
-  public addListener = (
-    { target, event, callback, options }: Listener,
-    cb?: () => void
-  ) => {
+  public addListener = ({ target, event, callback, options }: Listener, cb?: () => void) => {
     target.addEventListener(event, callback, options)
 
     this.listeners.push({
@@ -58,12 +47,8 @@ export default class EventObserverClass extends BasicObserverClass
     // Quirks mode on the contrary
     const isStandardsMode = document.compatMode === 'CSS1Compat'
 
-    const x = isStandardsMode
-      ? document.documentElement.scrollLeft
-      : document.body.scrollLeft
-    const y = isStandardsMode
-      ? document.documentElement.scrollTop
-      : document.body.scrollTop
+    const x = isStandardsMode ? document.documentElement.scrollLeft : document.body.scrollLeft
+    const y = isStandardsMode ? document.documentElement.scrollTop : document.body.scrollTop
 
     return { x, y }
   }
@@ -147,7 +132,6 @@ export default class EventObserverClass extends BasicObserverClass
         callback: this.getScrollRecord,
         options: true
       })
-      this.status.scroll = true
     }
 
     if (resize) {
@@ -156,7 +140,6 @@ export default class EventObserverClass extends BasicObserverClass
         event: 'resize',
         callback: _throttle(this.getResizeRecord)
       })
-      this.status.resize = true
     }
 
     if (form) {
@@ -174,23 +157,14 @@ export default class EventObserverClass extends BasicObserverClass
         callback: _throttle(this.getFormChangeRecord, 300),
         options: true
       })
-      this.status.form = true
     }
 
     _log('events observer ready!')
   }
 
   public uninstall() {
-    const eventName2StatusKey = {
-      change: 'form'
-    }
-
     this.listeners.forEach(({ target, event, callback }) => {
       target.removeEventListener(event, callback)
-
-      const statusKey = eventName2StatusKey[event] || event
-
-      this.status[statusKey] = false
     })
   }
 }

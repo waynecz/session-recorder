@@ -8,10 +8,7 @@ export function _now(): number {
   return Math.floor(performance.now())
 }
 
-export function _throttle<T, K>(
-  func: (T: T) => K,
-  wait: number = 100
-): (T: T) => K {
+export function _throttle<T, K>(func: (T: T) => K, wait: number = 100): (T: T) => K {
   let previous: number = _now()
 
   return function(...args: any[]): K {
@@ -39,11 +36,7 @@ export function _newuuid(): string {
  * @param name The name of method to be wrapped
  * @param replacement The function that should be used to wrap the given method
  */
-export function _replace(
-  source: object,
-  name: string,
-  replacement: (...args: any[]) => any
-): void {
+export function _replace(source: object, name: string, replacement: (...args: any[]) => any): void {
   const original = source[name]
 
   function doReplace() {
@@ -91,9 +84,7 @@ export function _parseURL(
   fragment?: string
   relative?: string
 } {
-  const match = href.match(
-    /^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$/
-  )
+  const match = href.match(/^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$/)
 
   if (!match) return {}
 

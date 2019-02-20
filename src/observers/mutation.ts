@@ -1,28 +1,18 @@
-import {
-  HighOrderObserver,
-  DOMMutationRecord,
-  DOMMutationTypes,
-  NodeMutationData,
-  MutationRecordX
-} from '../models/index'
-import { ID_KEY } from '../constants'
-import NikonD7000 from '../tools/NikonD7000'
+import { MutationRecordX } from '../models/index'
+import { RECORDER_ID } from '../constants'
+import SonyA7R3 from '../tools/SonyA7R3'
 import { _log, _warn } from '../tools/helpers'
-import BasicObserverClass from './index'
+import EventDrivenable from '../tools/pub-sub'
+import { Observer, DOMMutationRecord, DOMMutationTypes, NodeMutationData } from '../models/observers'
 
-const { getRecordIdByElement } = NikonD7000
+const { getRecordIdByElement } = SonyA7R3
 
 /**
  * Observe DOM change such as DOM-add/remove text-change attribute-change
  * and generate an Record
  */
-export default class DOMMutationObserverClass extends BasicObserverClass
-  implements HighOrderObserver {
-  public name: string = 'DOMMutationObserverClass'
+export default class DOMMutationObserver extends EventDrivenable implements Observer {
   private observer: MutationObserver
-  public status = {
-    mutation: true
-  }
 
   constructor(options: boolean) {
     super()
@@ -40,7 +30,7 @@ export default class DOMMutationObserverClass extends BasicObserverClass
       switch (mutationRecord.type) {
         case 'attributes': {
           // ignore recorderId mutate
-          if (attributeName === ID_KEY) return
+          if (attributeName === RECORDER_ID) return
 
           return this.getAttrReocrd(mutationRecord)
         }
@@ -63,10 +53,7 @@ export default class DOMMutationObserverClass extends BasicObserverClass
   }
 
   // when node's attribute change
-  private getAttrReocrd({
-    attributeName,
-    target
-  }: MutationRecordX): DOMMutationRecord {
+  private getAttrReocrd({ attributeName, target }: MutationRecordX): DOMMutationRecord {
     let record = { attr: {} } as DOMMutationRecord
     record.target = getRecordIdByElement(target)
 
@@ -188,11 +175,11 @@ export default class DOMMutationObserverClass extends BasicObserverClass
 
             nodeData.index = this.getNodeIndex(parentElement, node)
 
-            NikonD7000.bufferNewElement(node)
+            SonyA7R3.bufferNewElement(node)
 
             nodeData.html = node.outerHTML
 
-            NikonD7000.unmark(node, true)
+            SonyA7R3.unmark(node, true)
           }
         }
 
@@ -215,9 +202,7 @@ export default class DOMMutationObserverClass extends BasicObserverClass
             // when delete the whole textNode
             if (parentElement) {
               nodeData.html = node.textContent
-              nodeData.index = Array.prototype.slice
-                .call(parentElement.childNodes)
-                .indexOf(node)
+              nodeData.index = Array.prototype.slice.call(parentElement.childNodes).indexOf(node)
             } else {
               // 在没有 parentElement 的情况下我们无法获取到这个 textNode 节点的 index
               // 这时我们只能记录下它的 textContent 然后通过前后元素来辅助定位，这个步骤在播放器里进行
@@ -270,8 +255,7 @@ export default class DOMMutationObserverClass extends BasicObserverClass
   }
 
   public install() {
-    const mutationObserver =
-      (window as any).MutationObserver || (window as any).WebKitMutationObserver
+    const mutationObserver = (window as any).MutationObserver || (window as any).WebKitMutationObserver
 
     this.observer = new mutationObserver((records: MutationRecord[]) => {
       const { $emit } = this
@@ -293,8 +277,6 @@ export default class DOMMutationObserverClass extends BasicObserverClass
     })
 
     _log('mutation observer ready!')
-
-    this.status.mutation = true
   }
 
   public uninstall() {
@@ -302,7 +284,5 @@ export default class DOMMutationObserverClass extends BasicObserverClass
       this.observer.disconnect()
       this.observer = null
     }
-
-    this.status.mutation = false
   }
 }
