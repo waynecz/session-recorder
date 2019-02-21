@@ -1,5 +1,5 @@
 import { MouseReocrd, MouseTypes, Observer, Listener } from '../models/observers'
-import { _throttle, _log } from '../tools/helpers'
+import { _throttle, _log, _warn } from '../tools/helpers'
 import { RECORDER_PRESET } from '../constants'
 import EventDrivenable from '../tools/pub-sub'
 
@@ -31,7 +31,11 @@ export default class MouseObserver extends EventDrivenable implements Observer {
       callback
     })
 
-    cb && cb()
+    try {
+      cb && cb()
+    } catch (err) {
+      _warn(err)
+    }
   }
 
   private getMouseClickRecord = (evt: MouseEvent): void => {

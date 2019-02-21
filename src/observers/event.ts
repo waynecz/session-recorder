@@ -1,5 +1,5 @@
 import { ElementX, FormELement } from '../models/index'
-import { _throttle, _log } from '../tools/helpers'
+import { _throttle, _log, _warn } from '../tools/helpers'
 import SonyA7R3 from '../tools/SonyA7R3'
 import { RECORDER_PRESET } from '../constants'
 import { Observer, EventReocrd, Listener, EventTypes } from '../models/observers'
@@ -39,7 +39,11 @@ export default class EventObserver extends EventDrivenable implements Observer {
       callback
     })
 
-    cb && cb()
+    try {
+      cb && cb()
+    } catch (err) {
+      _warn(err)
+    }
   }
 
   // Provide that document's direction is `rtl`(default)

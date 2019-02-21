@@ -1,5 +1,5 @@
 import { RecorderWrappedXMLHttpRequest } from '../models/index'
-import { _replace, _recover, _newuuid, _log } from '../tools/helpers'
+import { _replace, _recover, _newuuid, _log, _warn } from '../tools/helpers'
 import { isFunction } from '../tools/is'
 import { RECORDER_PRESET } from '../constants'
 import EventDrivenable from '../tools/pub-sub'
@@ -95,10 +95,14 @@ export default class HttpObserver extends EventDrivenable implements Observer {
             // it will reject solely when a network error or CORS misconfigured occurred
             // more: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#Checking_that_the_fetch_was_successful
             .then((response: Response) => {
-              record.status = response.status
-              record.response = response.json()
+              try {
+                record.status = response.status
+                record.response = response.json()
 
-              $emit('observed', record)
+                $emit('observed', record)
+              } catch (err) {
+                _warn(err)
+              }
 
               return response
             })
@@ -175,7 +179,13 @@ export default class HttpObserver extends EventDrivenable implements Observer {
 
             if (record) {
               record.status = thisXHR.status
-              record.response = thisXHR.responseText || thisXHR.response
+              // if the responseType is neither 'text' nor ''
+              // read responseText would produce an error
+              if (thisXHR.responseType === '' || thisXHR.responseType === 'text') {
+                record.response = thisXHR.responseText || thisXHR.response
+              } else {
+                record.response = thisXHR.responseType
+              }
               // xhr send successfully
               $emit('observed', record)
             }
@@ -188,7 +198,12 @@ export default class HttpObserver extends EventDrivenable implements Observer {
           // if already had a hook
           _replace(thisXHR, 'onreadystatechange', originalStateChangeHook => {
             return (...args) => {
-              onreadystatechangeHandler.call(thisXHR)
+              try {
+                onreadystatechangeHandler.call(thisXHR)
+              } catch (err) {
+                _warn(err)
+              }
+
               originalStateChangeHook.call(thisXHR, ...args)
             }
           })
