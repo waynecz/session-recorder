@@ -1,6 +1,6 @@
 {
   "name": "session-recorder",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Record every movement in web",
   "main": "dist/index.js",
   "typings": "./dist/index.d.ts",
