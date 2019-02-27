@@ -1,8 +1,14 @@
-# Session Recorder
+# (🚧 WIP) Session Recorder
 
 > Imagine that a video camera continuously record the whole page
 
-See also [Session-Player(developing)](https://github.com/waynecz/session-player) consuming Recorder's data
+See also [Session-Player](https://github.com/waynecz/session-player) for consuming Recorder's data
+
+<p align="center">
+<img width="48%" src="https://github.com/waynecz/DS/raw/master/session-recorder/record.gif" />
+
+<img width="48%" src="https://github.com/waynecz/DS/raw/master/session-recorder/replay.gif" />
+</p>
 
 ### Record list:
 
@@ -24,8 +30,8 @@ See also [Session-Player(developing)](https://github.com/waynecz/session-player)
   { "t": 5, "type": "click", "x": 71, "y": 13 },
   { "t": 6, "type": "form", "target": 19, "k": "checked", "v": true },
   { "t": 7, "type": "jserr", "msg": "Type Error: ...", "url": "...", "err": "..." },
-  { "t": 8, "type": "xhr", "url": "...", "method": "GET", "id": "21asdcxz" },
-  { "t": 9, "type": "xhrend", "status": 503, "id": "21asdcxz" },
+  { "t": 8, "type": "xhr", "url": "...", "method": "GET", "response": "21asdcxz" },
+  { "t": 9, "type": "fetch", "status": 503, "response": "21asdcxz" },
   { "t": 10, "type": "move", "x": 38, "y": 510 },
   { "t": 11, "type": "console", "l": "warn", "msg": "..." }
 ]
@@ -33,8 +39,12 @@ See also [Session-Player(developing)](https://github.com/waynecz/session-player)
 
 ### Code intergration:
 
+<div align="center">
+<pre>npm i <a href="https://www.npmjs.com/package/session-recorder">session-recorder</a></pre>
+</div>
+
 ```javascript
-import SessionRecorder from '@wayne/session-recorder'
+import SessionRecorder from 'session-recorder'
 
 const myReocrder = new SessionRecorder()
 
@@ -46,16 +56,15 @@ myReocrder.end() // stop record
 
 ### TODO
 
-- [ ] VDOM
+- [ ] Use VDOM record mutation
 - [ ] Using WebWorker store trail data
-- [ ] Unbubble click
 
 <br>
 
 ### Build Setup
 
 ```shell
-# serve file with hot reload at http://localhost:8000/index.js
+# serve file with hot reload at http://localhost:8000
 npm run dev
 
 # build with tsc, complie into ESModule

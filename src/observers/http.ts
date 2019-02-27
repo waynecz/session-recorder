@@ -97,7 +97,7 @@ export default class HttpObserver extends EventDrivenable implements Observer {
             .then((response: Response) => {
               try {
                 record.status = response.status
-                record.response = response.json()
+                record.response = response.clone().json()
 
                 $emit('observed', record)
               } catch (err) {
